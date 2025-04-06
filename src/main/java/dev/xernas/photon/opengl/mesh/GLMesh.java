@@ -6,6 +6,7 @@ import dev.xernas.photon.opengl.GLRenderer;
 import dev.xernas.photon.opengl.utils.BufferUtils;
 import dev.xernas.photon.opengl.utils.GLUtils;
 import dev.xernas.photon.render.IMesh;
+import dev.xernas.photon.render.shader.Material;
 import dev.xernas.photon.utils.Image;
 import lombok.Getter;
 import org.lwjgl.system.MemoryUtil;
@@ -25,7 +26,7 @@ public class GLMesh implements IMesh, IBindeable {
     private final int[] indices;
     private final float[] normals;
     private final float[] textureCoords;
-    private final Image image;
+    private final Material material;
 
     private VAO vao;
 
@@ -35,12 +36,12 @@ public class GLMesh implements IMesh, IBindeable {
     private FloatBuffer textureCoordsBuffer;
     private int textureID;
 
-    public GLMesh(float[] vertices, int[] indices, float[] normals, float[] textureCoords, Image image) {
+    public GLMesh(float[] vertices, int[] indices, float[] normals, float[] textureCoords, Material material) {
         this.vertices = vertices;
         this.indices = indices;
         this.normals = normals;
         this.textureCoords = textureCoords;
-        this.image = image;
+        this.material = material;
     }
 
     @Override
@@ -52,7 +53,7 @@ public class GLMesh implements IMesh, IBindeable {
         verticesBuffer = vao.storeDataInAttributeList(0, 3, vertices);
         normalsBuffer = normals == null ? null : vao.storeDataInAttributeList(1, 3, normals);
         textureCoordsBuffer = textureCoords == null ? null : vao.storeDataInAttributeList(2, 2, textureCoords);
-        textureID = image == null ? 0 : GLUtils.loadTexture(image);
+        textureID = material.getTexture() == null ? 0 : GLUtils.loadTexture(material.getTexture());
         unbind();
     }
 
@@ -110,7 +111,12 @@ public class GLMesh implements IMesh, IBindeable {
 
     @Override
     public boolean hasTexture() {
-        return textureID != 0 && textureCoords != null && image != null;
+        return textureID != 0 && textureCoords != null && material.getTexture() != null;
+    }
+
+    @Override
+    public Material getMaterial() {
+        return material;
     }
 
     @Getter
