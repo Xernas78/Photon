@@ -78,11 +78,17 @@ public class GLWindow implements IWindow {
         PhotonImage icon = hints.getIcon();
         if (icon != null) {
             ByteBuffer iconBuffer = icon.getData();
-            try (GLFWImage.Buffer icons = GLFWImage.create(1)) {
-                GLFWImage iconImage = GLFWImage.create().set(icon.getWidth(), icon.getHeight(), iconBuffer);
-                icons.put(0, iconImage);
-                GLFW.glfwSetWindowIcon(windowHandle, icons);
-            }
+            GLFWImage.Buffer iconBufferStruct = GLFWImage.malloc(1);
+            GLFWImage iconImage = GLFWImage.malloc();
+
+            iconImage.set(icon.getWidth(), icon.getHeight(), iconBuffer);
+            iconBufferStruct.put(0, iconImage);
+
+            GLFW.glfwSetWindowIcon(windowHandle, iconBufferStruct);
+
+            // Don't forget to free native memory!
+            iconBufferStruct.free();
+            iconImage.free();
         }
     }
 
