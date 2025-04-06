@@ -3,19 +3,22 @@ package dev.xernas.photon.opengl;
 import dev.xernas.photon.input.Action;
 import dev.xernas.photon.input.Input;
 import dev.xernas.photon.input.Key;
+import dev.xernas.photon.utils.PhotonImage;
 import dev.xernas.photon.window.WindowHints;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.window.IWindow;
 import lombok.Getter;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWImage;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 
 import java.awt.*;
+import java.nio.ByteBuffer;
 
-import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 
 @Getter
@@ -49,6 +52,14 @@ public class GLWindow implements IWindow {
             throw new PhotonException("Failed to create window");
         }
 
+        GLFWVidMode videoMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
+        if (videoMode == null) throw new PhotonException("Failed to get video mode");
+        GLFW.glfwSetWindowPos(
+                windowHandle,
+                (videoMode.width() - width) / 2,
+                (videoMode.height() - height) / 2
+        );
+
         GLFW.glfwMakeContextCurrent(windowHandle);
         GL.createCapabilities();
 
@@ -63,6 +74,16 @@ public class GLWindow implements IWindow {
         GLFW.glfwSetCursorPosCallback(windowHandle, (window, xpos, ypos) -> input.setMousePosition((float) xpos, (float) ypos));
 
         hints.applyOGL();
+
+        PhotonImage icon = hints.getIcon();
+        if (icon != null) {
+            ByteBuffer iconBuffer = icon.getData();
+            try (GLFWImage.Buffer icons = GLFWImage.create(1)) {
+                GLFWImage iconImage = GLFWImage.create().set(icon.getWidth(), icon.getHeight(), iconBuffer);
+                icons.put(0, iconImage);
+                GLFW.glfwSetWindowIcon(windowHandle, icons);
+            }
+        }
     }
 
     @Override
@@ -99,13 +120,26 @@ public class GLWindow implements IWindow {
     }
 
     @Override
-    public void show() {
+    public void show(boolean maximized) {
         GLFW.glfwShowWindow(windowHandle);
+        if (maximized) maximize();
     }
 
     @Override
     public void maximize() {
         GLFW.glfwMaximizeWindow(windowHandle);
+    }
+
+    @Override
+    public void restore() {
+        GLFW.glfwRestoreWindow(windowHandle);
+        GLFWVidMode videoMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
+        if (videoMode == null) return;
+        GLFW.glfwSetWindowPos(
+                windowHandle,
+                (videoMode.width() - width) / 2,
+                (videoMode.height() - height) / 2
+        );
     }
 
     @Override
@@ -134,12 +168,12 @@ public class GLWindow implements IWindow {
 
     @Override
     public boolean isKeyPressed(Key key) {
-        return glfwGetKey(windowHandle, key.getQwerty()) == GLFW_PRESS;
+        return GLFW.glfwGetKey(windowHandle, key.getQwerty()) == GLFW_PRESS;
     }
 
     @Override
     public boolean isMouseButtonPressed(Key button) {
-        return glfwGetMouseButton(windowHandle, button.getQwerty()) == GLFW_PRESS;
+        return GLFW.glfwGetMouseButton(windowHandle, button.getQwerty()) == GLFW_PRESS;
     }
 
     @Override

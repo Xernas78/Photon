@@ -1,15 +1,15 @@
 package dev.xernas.photon.window;
 
+import dev.xernas.photon.utils.PhotonImage;
 import lombok.Getter;
 import lombok.Setter;
 import org.lwjgl.glfw.GLFW;
-
-import java.awt.*;
 
 @Getter
 @Setter
 public class WindowHints {
 
+    private PhotonImage icon;
     private boolean resizable;
     private boolean visible;
     private boolean decorated;
@@ -18,15 +18,15 @@ public class WindowHints {
     private boolean isAzerty;
 
     public WindowHints() {
-        this.resizable = true;
-        this.visible = true;
-        this.decorated = true;
-        this.vsync = false;
-        this.maximized = false;
-        this.isAzerty = true;
+        this(null, true, true, true, false, false, true);
     }
 
-    public WindowHints(boolean resizable, boolean visible, boolean decorated, boolean vsync, boolean maximized, boolean isAzerty) {
+    public WindowHints(PhotonImage icon) {
+        this(icon, true, true, true, false, false, true);
+    }
+
+    public WindowHints(PhotonImage icon, boolean resizable, boolean visible, boolean decorated, boolean vsync, boolean maximized, boolean isAzerty) {
+        this.icon = icon;
         this.resizable = resizable;
         this.visible = visible;
         this.decorated = decorated;
@@ -43,8 +43,6 @@ public class WindowHints {
         //TODO Faire gaffe à ça
         GLFW.glfwWindowHint(GLFW.GLFW_DOUBLEBUFFER, GLFW.GLFW_TRUE);
         // END
-
-        GLFW.glfwWindowHint(GLFW.GLFW_MAXIMIZED, maximized ? GLFW.GLFW_TRUE : GLFW.GLFW_FALSE);
     }
 
     public void applyOGL() {

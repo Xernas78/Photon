@@ -43,9 +43,11 @@ public interface IWindow extends Initializable {
 
     void setBackgroundColor(Color color);
 
-    void show();
+    void show(boolean maximized);
 
     void maximize();
+
+    void restore();
 
     void hide();
 

@@ -1,7 +1,10 @@
 package dev.xernas.photon.utils;
 
+import lombok.Getter;
+
 import java.nio.ByteBuffer;
 
+@Getter
 public class PhotonImage {
 
     private final int width;
@@ -12,18 +15,6 @@ public class PhotonImage {
         this.width = width;
         this.height = height;
         this.data = data;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public ByteBuffer getData() {
-        return data;
     }
 
     public static PhotonImage fromByteArray(int width, int height, byte[] data) {
