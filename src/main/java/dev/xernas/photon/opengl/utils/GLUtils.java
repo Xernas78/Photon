@@ -2,12 +2,10 @@ package dev.xernas.photon.opengl.utils;
 
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.utils.GlobalUtilitaries;
-import dev.xernas.photon.utils.Image;
+import dev.xernas.photon.utils.PhotonImage;
 import org.lwjgl.stb.STBImage;
 
 import java.nio.ByteBuffer;
-import java.nio.file.Path;
-import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_REPEAT;
@@ -15,10 +13,10 @@ import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
 public class GLUtils {
 
-    public static int loadTexture(Image image) throws PhotonException {
-        ByteBuffer buffer = image.getData();
-        int width = image.getWidth();
-        int height = image.getHeight();
+    public static int loadTexture(PhotonImage photonImage) throws PhotonException {
+        ByteBuffer buffer = photonImage.getData();
+        int width = photonImage.getWidth();
+        int height = photonImage.getHeight();
 
         int id = GlobalUtilitaries.requireNotEquals(glGenTextures(), 0, "Error creating texture");
         glBindTexture(GL_TEXTURE_2D, id);

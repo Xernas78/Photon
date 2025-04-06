@@ -16,7 +16,7 @@ import java.nio.file.Path;
 
 public class GlobalUtilitaries {
 
-    public static Image loadImage(Path iconPath) throws PhotonException {
+    public static PhotonImage loadImage(Path iconPath) throws PhotonException {
         int width, height;
         ByteBuffer imageBuffer;
 
@@ -42,7 +42,7 @@ public class GlobalUtilitaries {
                 width = widthBuffer.get();
                 height = heightBuffer.get();
 
-                return new Image(width, height, buffer);
+                return new PhotonImage(width, height, buffer);
             }
         } catch (IOException e) {
             throw new PhotonException("Error loading image file: " + iconPath);

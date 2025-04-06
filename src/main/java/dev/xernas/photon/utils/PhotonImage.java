@@ -2,13 +2,13 @@ package dev.xernas.photon.utils;
 
 import java.nio.ByteBuffer;
 
-public class Image {
+public class PhotonImage {
 
     private final int width;
     private final int height;
     private final ByteBuffer data;
 
-    public Image(int width, int height, ByteBuffer data) {
+    public PhotonImage(int width, int height, ByteBuffer data) {
         this.width = width;
         this.height = height;
         this.data = data;
@@ -26,11 +26,11 @@ public class Image {
         return data;
     }
 
-    public static Image fromByteArray(int width, int height, byte[] data) {
+    public static PhotonImage fromByteArray(int width, int height, byte[] data) {
         ByteBuffer buffer = ByteBuffer.allocateDirect(data.length);
         buffer.put(data);
         buffer.flip();
-        return new Image(width, height, buffer);
+        return new PhotonImage(width, height, buffer);
     }
     
 }

@@ -7,15 +7,12 @@ import dev.xernas.photon.opengl.utils.BufferUtils;
 import dev.xernas.photon.opengl.utils.GLUtils;
 import dev.xernas.photon.render.IMesh;
 import dev.xernas.photon.render.shader.Material;
-import dev.xernas.photon.utils.Image;
 import lombok.Getter;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL30.*;

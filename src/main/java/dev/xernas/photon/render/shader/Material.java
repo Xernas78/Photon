@@ -1,12 +1,12 @@
 package dev.xernas.photon.render.shader;
 
-import dev.xernas.photon.utils.Image;
+import dev.xernas.photon.utils.PhotonImage;
 
 import java.awt.*;
 
 public interface Material {
 
-    Image getTexture();
+    PhotonImage getTexture();
 
     Color getBaseColor();
 
