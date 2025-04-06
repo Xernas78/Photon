@@ -15,8 +15,7 @@ import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
 public class GLUtils {
 
-    public static int loadTexture(Path textPath) throws PhotonException {
-        Image image = GlobalUtilitaries.loadImage(textPath);
+    public static int loadTexture(Image image) throws PhotonException {
         ByteBuffer buffer = image.getData();
         int width = image.getWidth();
         int height = image.getHeight();

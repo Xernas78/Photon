@@ -40,6 +40,15 @@ public class GLRenderer {
         wireFrame = false;
     }
 
+    public static void enableBackfaceCulling() {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+    }
+
+    public static void disableBackfaceCulling() {
+        glDisable(GL_CULL_FACE);
+    }
+
     public static void enableVertexAttribArray(int attribute) {
         glEnableVertexAttribArray(attribute);
     }

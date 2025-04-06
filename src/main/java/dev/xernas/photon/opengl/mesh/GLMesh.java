@@ -6,6 +6,7 @@ import dev.xernas.photon.opengl.GLRenderer;
 import dev.xernas.photon.opengl.utils.BufferUtils;
 import dev.xernas.photon.opengl.utils.GLUtils;
 import dev.xernas.photon.render.IMesh;
+import dev.xernas.photon.utils.Image;
 import lombok.Getter;
 import org.lwjgl.system.MemoryUtil;
 
@@ -24,7 +25,7 @@ public class GLMesh implements IMesh, IBindeable {
     private final int[] indices;
     private final float[] normals;
     private final float[] textureCoords;
-    private final Path texturePath;
+    private final Image image;
 
     private VAO vao;
 
@@ -34,12 +35,12 @@ public class GLMesh implements IMesh, IBindeable {
     private FloatBuffer textureCoordsBuffer;
     private int textureID;
 
-    public GLMesh(float[] vertices, int[] indices, float[] normals, float[] textureCoords, Path texturePath) {
+    public GLMesh(float[] vertices, int[] indices, float[] normals, float[] textureCoords, Image image) {
         this.vertices = vertices;
         this.indices = indices;
         this.normals = normals;
         this.textureCoords = textureCoords;
-        this.texturePath = texturePath;
+        this.image = image;
     }
 
     @Override
@@ -51,7 +52,7 @@ public class GLMesh implements IMesh, IBindeable {
         verticesBuffer = vao.storeDataInAttributeList(0, 3, vertices);
         normalsBuffer = normals == null ? null : vao.storeDataInAttributeList(1, 3, normals);
         textureCoordsBuffer = textureCoords == null ? null : vao.storeDataInAttributeList(2, 2, textureCoords);
-        textureID = texturePath == null ? 0 : GLUtils.loadTexture(texturePath);
+        textureID = image == null ? 0 : GLUtils.loadTexture(image);
         unbind();
     }
 
@@ -109,7 +110,7 @@ public class GLMesh implements IMesh, IBindeable {
 
     @Override
     public boolean hasTexture() {
-        return textureID != 0 && textureCoords != null && texturePath != null;
+        return textureID != 0 && textureCoords != null && image != null;
     }
 
     @Getter
