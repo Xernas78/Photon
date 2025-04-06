@@ -32,6 +32,7 @@ public class GLMesh implements IMesh, IBindeable {
     private FloatBuffer normalsBuffer;
     private FloatBuffer textureCoordsBuffer;
     private int textureID;
+    private boolean hasTexture;
 
     public GLMesh(float[] vertices, int[] indices, float[] normals, float[] textureCoords, Material material) {
         this.vertices = vertices;
@@ -51,6 +52,7 @@ public class GLMesh implements IMesh, IBindeable {
         normalsBuffer = normals == null ? null : vao.storeDataInAttributeList(1, 3, normals);
         textureCoordsBuffer = textureCoords == null ? null : vao.storeDataInAttributeList(2, 2, textureCoords);
         textureID = material.getTexture() == null ? 0 : GLUtils.loadTexture(material.getTexture());
+        hasTexture = textureID != 0 && textureCoords != null && material.getTexture() != null;
         unbind();
     }
 
@@ -108,7 +110,7 @@ public class GLMesh implements IMesh, IBindeable {
 
     @Override
     public boolean hasTexture() {
-        return textureID != 0 && textureCoords != null && material.getTexture() != null;
+        return hasTexture;
     }
 
     @Override
