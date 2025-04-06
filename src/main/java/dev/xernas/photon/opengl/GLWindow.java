@@ -104,6 +104,11 @@ public class GLWindow implements IWindow {
     }
 
     @Override
+    public void maximize() {
+        GLFW.glfwMaximizeWindow(windowHandle);
+    }
+
+    @Override
     public void hide() {
         GLFW.glfwHideWindow(windowHandle);
     }

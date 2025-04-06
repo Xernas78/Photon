@@ -45,6 +45,8 @@ public interface IWindow extends Initializable {
 
     void show();
 
+    void maximize();
+
     void hide();
 
     boolean shouldClose();
