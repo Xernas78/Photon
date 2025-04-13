@@ -11,4 +11,6 @@ public interface Material {
 
     Color getBaseColor();
 
+    boolean isIlluminated();
+
 }
