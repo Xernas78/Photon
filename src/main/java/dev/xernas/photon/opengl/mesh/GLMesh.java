@@ -7,6 +7,7 @@ import dev.xernas.photon.opengl.utils.BufferUtils;
 import dev.xernas.photon.opengl.utils.GLUtils;
 import dev.xernas.photon.render.IMesh;
 import dev.xernas.photon.render.shader.Material;
+import dev.xernas.photon.utils.PhotonImage;
 import lombok.Getter;
 import org.lwjgl.system.MemoryUtil;
 
@@ -33,6 +34,7 @@ public class GLMesh implements IMesh, IBindeable {
     private FloatBuffer textureCoordsBuffer;
     private int textureID;
     private boolean hasTexture;
+    private PhotonImage materialTexture;
 
     public GLMesh(float[] vertices, int[] indices, float[] normals, float[] textureCoords, Material material) {
         this.vertices = vertices;
@@ -46,13 +48,14 @@ public class GLMesh implements IMesh, IBindeable {
     public void init() throws PhotonException {
         vao = new VAO();
         vao.init();
+        materialTexture = material.getTexture();
         bind();
         indicesBuffer = vao.storeIndicesBuffer(indices);
         verticesBuffer = vao.storeDataInAttributeList(0, 3, vertices);
         normalsBuffer = normals == null ? null : vao.storeDataInAttributeList(1, 3, normals);
         textureCoordsBuffer = textureCoords == null ? null : vao.storeDataInAttributeList(2, 2, textureCoords);
-        textureID = material.getTexture() == null ? 0 : GLUtils.loadTexture(material.getTexture());
-        hasTexture = textureID != 0 && textureCoords != null && material.getTexture() != null;
+        textureID = materialTexture == null ? 0 : GLUtils.loadTexture(materialTexture);
+        hasTexture = textureID != 0 && textureCoords != null && materialTexture != null;
         unbind();
     }
 
