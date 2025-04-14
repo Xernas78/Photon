@@ -18,11 +18,11 @@ public class WindowHints {
     private boolean isAzerty;
 
     public WindowHints() {
-        this(null, true, true, true, false, false, true);
+        this(null, true, false, true, false, false, true);
     }
 
     public WindowHints(PhotonImage icon) {
-        this(icon, true, true, true, false, false, true);
+        this(icon, true, false, true, false, false, true);
     }
 
     public WindowHints(PhotonImage icon, boolean resizable, boolean visible, boolean decorated, boolean vsync, boolean maximized, boolean isAzerty) {

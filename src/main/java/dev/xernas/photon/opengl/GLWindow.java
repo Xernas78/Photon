@@ -142,10 +142,14 @@ public class GLWindow implements IWindow {
         long monitor = monitors.get(monitorIndex);
         GLFWVidMode videoMode = GLFW.glfwGetVideoMode(monitor);
         if (videoMode == null) return;
+        int[] xpos = new int[1];
+        int[] ypos = new int[1];
+        GLFW.glfwGetMonitorPos(monitor, xpos, ypos);
+
         GLFW.glfwSetWindowPos(
                 windowHandle,
-                (videoMode.width() - width) / 2,
-                (videoMode.height() - height) / 2
+                xpos[0] + (videoMode.width() - width) / 2,
+                ypos[0] + (videoMode.height() - height) / 2
         );
     }
 
