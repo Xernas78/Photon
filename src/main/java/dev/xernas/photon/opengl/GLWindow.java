@@ -175,6 +175,11 @@ public class GLWindow implements IWindow {
     }
 
     @Override
+    public void setShouldClose(boolean shouldClose) {
+        GLFW.glfwSetWindowShouldClose(windowHandle, shouldClose);
+    }
+
+    @Override
     public void setTitle(String title) {
         this.title = title;
         GLFW.glfwSetWindowTitle(windowHandle, title);

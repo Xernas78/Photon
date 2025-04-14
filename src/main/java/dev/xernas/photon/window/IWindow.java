@@ -53,6 +53,8 @@ public interface IWindow extends Initializable {
 
     boolean shouldClose();
 
+    void setShouldClose(boolean shouldClose);
+
     void close();
 
     void stop();
