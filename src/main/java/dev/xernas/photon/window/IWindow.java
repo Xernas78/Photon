@@ -43,7 +43,7 @@ public interface IWindow extends Initializable {
 
     void setBackgroundColor(Color color);
 
-    void show(boolean maximized);
+    void show(int monitorIndex, boolean maximized);
 
     void maximize();
 

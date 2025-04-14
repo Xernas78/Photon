@@ -8,6 +8,7 @@ import dev.xernas.photon.window.WindowHints;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.window.IWindow;
 import lombok.Getter;
+import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
@@ -18,6 +19,8 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.awt.*;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 
@@ -32,6 +35,9 @@ public class GLWindow implements IWindow {
     private Color color = Color.BLACK;
     private final WindowHints hints;
     private final Input input;
+    private final List<Long> monitors = new ArrayList<>();
+
+    private int lastMonitorIndex = 0;
 
     public GLWindow(String title, int width, int height, WindowHints hints) {
         this.defaultTitle = title;
@@ -52,18 +58,21 @@ public class GLWindow implements IWindow {
             throw new PhotonException("Failed to create window");
         }
 
-        GLFWVidMode videoMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
-        if (videoMode == null) throw new PhotonException("Failed to get video mode");
-        GLFW.glfwSetWindowPos(
-                windowHandle,
-                (videoMode.width() - width) / 2,
-                (videoMode.height() - height) / 2
-        );
-
         GLFW.glfwMakeContextCurrent(windowHandle);
         GL.createCapabilities();
 
         GL11.glViewport(0, 0, width, height);
+
+        long primaryMonitor = GLFW.glfwGetPrimaryMonitor();
+        PointerBuffer monitorsBuffer = GLFW.glfwGetMonitors();
+        if (monitorsBuffer == null) throw new PhotonException("Failed to get monitors");
+        monitors.add(primaryMonitor);
+        for (int i = 0; i < monitorsBuffer.limit(); i++) {
+            long monitor = monitorsBuffer.get(i);
+            if (monitor == primaryMonitor) continue;
+            monitors.add(monitor);
+        }
+
         // Resize
         GLFW.glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> resize(width, height));
         // Keyboard
@@ -126,9 +135,18 @@ public class GLWindow implements IWindow {
     }
 
     @Override
-    public void show(boolean maximized) {
+    public void show(int monitorIndex, boolean maximized) {
         GLFW.glfwShowWindow(windowHandle);
         if (maximized) maximize();
+        lastMonitorIndex = monitorIndex;
+        long monitor = monitors.get(monitorIndex);
+        GLFWVidMode videoMode = GLFW.glfwGetVideoMode(monitor);
+        if (videoMode == null) return;
+        GLFW.glfwSetWindowPos(
+                windowHandle,
+                (videoMode.width() - width) / 2,
+                (videoMode.height() - height) / 2
+        );
     }
 
     @Override
@@ -139,13 +157,7 @@ public class GLWindow implements IWindow {
     @Override
     public void restore() {
         GLFW.glfwRestoreWindow(windowHandle);
-        GLFWVidMode videoMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
-        if (videoMode == null) return;
-        GLFW.glfwSetWindowPos(
-                windowHandle,
-                (videoMode.width() - width) / 2,
-                (videoMode.height() - height) / 2
-        );
+        show(lastMonitorIndex, false);
     }
 
     @Override
