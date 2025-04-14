@@ -2,6 +2,7 @@ package dev.xernas.photon.opengl.shader;
 
 import dev.xernas.photon.render.shader.IUniform;
 import lombok.Getter;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
@@ -37,6 +38,8 @@ public class GLUniform<T> implements IUniform<T> {
                 glUniform1i(location, (Boolean) value ? 1 : 0);
             } else if (value instanceof Matrix4f) {
                 glUniformMatrix4fv(location, false, ((Matrix4f) value).get(stack.mallocFloat(16)));
+            } else if (value instanceof Matrix3f) {
+                glUniformMatrix3fv(location, false, ((Matrix3f) value).get(stack.mallocFloat(9)));
             } else if (value instanceof Vector3f v) {
                 glUniform3f(location, v.x, v.y, v.z);
             } else if (value instanceof Color color) {
