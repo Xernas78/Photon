@@ -2,9 +2,11 @@ package dev.xernas.photon.input;
 
 import dev.xernas.photon.window.IWindow;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 @Getter
 public class Input {
@@ -13,6 +15,9 @@ public class Input {
     private final boolean azerty;
     private final Map<Key, Action> keyMap = new HashMap<>();
     private final MousePosition mousePosition;
+
+    @Setter
+    private Consumer<IWindow> onResize;
 
     public Input(IWindow window, boolean azerty) {
         this.window = window;

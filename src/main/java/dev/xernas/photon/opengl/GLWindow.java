@@ -21,6 +21,7 @@ import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 
@@ -74,7 +75,11 @@ public class GLWindow implements IWindow {
         }
 
         // Resize
-        GLFW.glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> resize(width, height));
+        GLFW.glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> {
+            resize(width, height);
+            Consumer<IWindow> onResize = input.getOnResize();
+            if (onResize != null) onResize.accept(this);
+        });
         // Keyboard
         GLFW.glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> input.setKeyAction(Key.fromCode(key, input.isAzerty()), Action.fromCode(action)));
         // Mouse
