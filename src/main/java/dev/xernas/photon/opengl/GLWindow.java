@@ -43,7 +43,6 @@ public class GLWindow implements IWindow {
 
     private int lastMonitorIndex = 0;
     private boolean maximized = false;
-    private boolean shouldActualizeMousePosition = true;
 
     public GLWindow(String title, int width, int height, WindowHints hints) {
         this.defaultTitle = title;
@@ -81,14 +80,23 @@ public class GLWindow implements IWindow {
 
         // Resize
         GLFW.glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> {
+            if (width == 0 || height == 0) return;
             resize(width, height);
-            Consumer<IWindow> onResize = input.getOnResize();
-            if (onResize != null) onResize.accept(this);
+            List<Consumer<IWindow>> onResize = input.getOnResize();
+            for (Consumer<IWindow> consumer : onResize) consumer.accept(this);
         });
         // Keyboard
         GLFW.glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> input.setKeyAction(Key.fromCode(key, input.isAzerty()), Action.fromCode(action)));
         // Mouse
         GLFW.glfwSetMouseButtonCallback(windowHandle, (window, button, action, mods) -> input.setKeyAction(Key.fromCode(button, input.isAzerty()), Action.fromCode(action)));
+
+        GLFW.glfwSetCursorPosCallback(windowHandle, (window, xpos, ypos) -> {
+            input.setMousePosition(xpos, ypos);
+        });
+
+        GLFW.glfwSetWindowMaximizeCallback(windowHandle, (window, maximized) -> {
+            this.maximized = maximized;
+        });
 
         hints.applyOGL();
         maximized = hints.isMaximized();
@@ -123,11 +131,10 @@ public class GLWindow implements IWindow {
             DoubleBuffer xCursorPos = stack.mallocDouble(1);
             DoubleBuffer yCursorPos = stack.mallocDouble(1);
             GLFW.glfwGetCursorPos(windowHandle, xCursorPos, yCursorPos);
-            if (shouldActualizeMousePosition) input.setMousePosition(xCursorPos.get(0), yCursorPos.get(0));
             IntBuffer xWindowPos = stack.mallocInt(1);
             IntBuffer yWindowPos = stack.mallocInt(1);
             GLFW.glfwGetWindowPos(windowHandle, xWindowPos, yWindowPos);
-            input.setAbsoluteMousePosition(input.getMousePosition().getX() + xWindowPos.get(0), input.getMousePosition().getY() + yWindowPos.get(0));
+            input.setAbsoluteMousePosition(xCursorPos.get(0) + xWindowPos.get(0), yCursorPos.get(0) + yWindowPos.get(0));
         }
     }
 

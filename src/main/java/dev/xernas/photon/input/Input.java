@@ -4,7 +4,9 @@ import dev.xernas.photon.window.IWindow;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -16,9 +18,7 @@ public class Input {
     private final Map<Key, Action> keyMap = new HashMap<>();
     private final MousePosition mousePosition;
     private final MousePosition absoluteMousePosition;
-
-    @Setter
-    private Consumer<IWindow> onResize;
+    private final List<Consumer<IWindow>> onResize = new ArrayList<>();
 
     public Input(IWindow window, boolean azerty) {
         this.window = window;
@@ -69,5 +69,9 @@ public class Input {
 
     public void setAbsoluteMousePosition(double x, double y) {
         absoluteMousePosition.set((float) x, (float) y);
+    }
+
+    public void setOnResize(Consumer<IWindow> onResize) {
+        this.onResize.add(onResize);
     }
 }
