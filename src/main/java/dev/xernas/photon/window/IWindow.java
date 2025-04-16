@@ -45,9 +45,13 @@ public interface IWindow extends Initializable {
 
     void show(int monitorIndex, boolean maximized);
 
+    void minimize();
+
     void maximize();
 
     void restore();
+
+    boolean isMaximized();
 
     void hide();
 

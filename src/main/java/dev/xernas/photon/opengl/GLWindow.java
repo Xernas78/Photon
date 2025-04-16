@@ -39,6 +39,7 @@ public class GLWindow implements IWindow {
     private final List<Long> monitors = new ArrayList<>();
 
     private int lastMonitorIndex = 0;
+    private boolean maximized = false;
 
     public GLWindow(String title, int width, int height, WindowHints hints) {
         this.defaultTitle = title;
@@ -88,6 +89,7 @@ public class GLWindow implements IWindow {
         GLFW.glfwSetCursorPosCallback(windowHandle, (window, xpos, ypos) -> input.setMousePosition((float) xpos, (float) ypos));
 
         hints.applyOGL();
+        maximized = hints.isMaximized();
 
         PhotonImage icon = hints.getIcon();
         if (icon != null) {
@@ -159,14 +161,26 @@ public class GLWindow implements IWindow {
     }
 
     @Override
+    public void minimize() {
+        GLFW.glfwIconifyWindow(windowHandle);
+    }
+
+    @Override
     public void maximize() {
         GLFW.glfwMaximizeWindow(windowHandle);
+        maximized = true;
     }
 
     @Override
     public void restore() {
         GLFW.glfwRestoreWindow(windowHandle);
         show(lastMonitorIndex, false);
+        maximized = false;
+    }
+
+    @Override
+    public boolean isMaximized() {
+        return maximized;
     }
 
     @Override
