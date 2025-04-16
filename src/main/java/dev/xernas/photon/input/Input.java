@@ -32,36 +32,27 @@ public class Input {
         keyMap.clear();
     }
 
-    public boolean keyPress(Key key) {
-        return window.isKeyPressed(key);
-    }
-
-    public boolean keyRelease(Key key) {
-        return keyMap.get(key) == Action.RELEASE;
-    }
-
-    public boolean keyHold(Key key) {
-        return keyMap.get(key) == Action.HOLD;
-    }
-
-    public boolean keyIdle(Key key) {
-        return keyMap.getOrDefault(key, Action.IDLE) == Action.IDLE;
-    }
-
     public Action getKeyAction(Key key) {
         return keyMap.getOrDefault(key, Action.IDLE);
     }
 
+    public boolean keyPress(Key key) {
+        return window.isKeyPressed(key);
+    }
     public boolean mousePress(Key button) {
         return window.isMouseButtonPressed(button);
     }
 
-    public boolean mouseRelease(Key button) {
-        return keyMap.get(button) == Action.RELEASE;
+    public boolean isReleasing(Key key) {
+        return getKeyAction(key) == Action.RELEASE;
     }
 
-    public boolean mouseIdle(Key button) {
-        return keyMap.getOrDefault(button, Action.IDLE) == Action.IDLE;
+    public boolean isHolding(Key key) {
+        return getKeyAction(key) == Action.HOLD;
+    }
+
+    public boolean isPressing(Key button) {
+        return getKeyAction(button) == Action.PRESS;
     }
 
     public Action getMouseAction(Key button) {
