@@ -15,10 +15,13 @@ import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 import java.awt.*;
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -40,6 +43,7 @@ public class GLWindow implements IWindow {
 
     private int lastMonitorIndex = 0;
     private boolean maximized = false;
+    private boolean shouldActualizeMousePosition = true;
 
     public GLWindow(String title, int width, int height, WindowHints hints) {
         this.defaultTitle = title;
@@ -85,8 +89,6 @@ public class GLWindow implements IWindow {
         GLFW.glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> input.setKeyAction(Key.fromCode(key, input.isAzerty()), Action.fromCode(action)));
         // Mouse
         GLFW.glfwSetMouseButtonCallback(windowHandle, (window, button, action, mods) -> input.setKeyAction(Key.fromCode(button, input.isAzerty()), Action.fromCode(action)));
-        // Mouse position
-        GLFW.glfwSetCursorPosCallback(windowHandle, (window, xpos, ypos) -> input.setMousePosition((float) xpos, (float) ypos));
 
         hints.applyOGL();
         maximized = hints.isMaximized();
@@ -117,6 +119,16 @@ public class GLWindow implements IWindow {
     @Override
     public void updateInput() throws PhotonException {
         input.updateInput();
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            DoubleBuffer xCursorPos = stack.mallocDouble(1);
+            DoubleBuffer yCursorPos = stack.mallocDouble(1);
+            GLFW.glfwGetCursorPos(windowHandle, xCursorPos, yCursorPos);
+            if (shouldActualizeMousePosition) input.setMousePosition(xCursorPos.get(0), yCursorPos.get(0));
+            IntBuffer xWindowPos = stack.mallocInt(1);
+            IntBuffer yWindowPos = stack.mallocInt(1);
+            GLFW.glfwGetWindowPos(windowHandle, xWindowPos, yWindowPos);
+            input.setAbsoluteMousePosition(input.getMousePosition().getX() + xWindowPos.get(0), input.getMousePosition().getY() + yWindowPos.get(0));
+        }
     }
 
     @Override
@@ -153,8 +165,7 @@ public class GLWindow implements IWindow {
         int[] ypos = new int[1];
         GLFW.glfwGetMonitorPos(monitor, xpos, ypos);
 
-        GLFW.glfwSetWindowPos(
-                windowHandle,
+        setPosition(
                 xpos[0] + (videoMode.width() - width) / 2,
                 ypos[0] + (videoMode.height() - height) / 2
         );
@@ -196,6 +207,15 @@ public class GLWindow implements IWindow {
     @Override
     public void setShouldClose(boolean shouldClose) {
         GLFW.glfwSetWindowShouldClose(windowHandle, shouldClose);
+    }
+
+    @Override
+    public void setPosition(int x, int y) {
+        GLFW.glfwSetWindowPos(
+                windowHandle,
+                x,
+                y
+        );
     }
 
     @Override

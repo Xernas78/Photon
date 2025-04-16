@@ -15,6 +15,7 @@ public class Input {
     private final boolean azerty;
     private final Map<Key, Action> keyMap = new HashMap<>();
     private final MousePosition mousePosition;
+    private final MousePosition absoluteMousePosition;
 
     @Setter
     private Consumer<IWindow> onResize;
@@ -23,6 +24,7 @@ public class Input {
         this.window = window;
         this.azerty = azerty;
         this.mousePosition = new MousePosition(0, 0);
+        this.absoluteMousePosition = new MousePosition(0, 0);
     }
 
     public void updateInput() {
@@ -72,5 +74,9 @@ public class Input {
 
     public void setMousePosition(double x, double y) {
         mousePosition.set((float) x, (float) y);
+    }
+
+    public void setAbsoluteMousePosition(double x, double y) {
+        absoluteMousePosition.set((float) x, (float) y);
     }
 }
