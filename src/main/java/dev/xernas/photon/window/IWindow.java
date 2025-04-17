@@ -4,6 +4,7 @@ import dev.xernas.photon.Initializable;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.input.Input;
 import dev.xernas.photon.input.Key;
+import org.joml.Vector2f;
 
 import java.awt.*;
 
@@ -65,12 +66,22 @@ public interface IWindow extends Initializable {
 
     void stop();
 
+    default boolean isHorizontal() {
+        return getWidth() > getHeight();
+    }
+
+    default boolean isVertical() {
+        return getHeight() > getWidth();
+    }
+
     default float getAspectRatio() {
-        if (getWidth() > getHeight()) {
-            return (float) getWidth() / (float) getHeight();
-        }
-        else {
-            return (float) getHeight() / (float) getWidth();
-        }
+        if (isHorizontal()) return (float) getWidth() / getHeight();
+        else return (float) getHeight() / getWidth();
+    }
+
+    default Vector2f getAspectRatios() {
+        float horizontalAspectRatio = (float) getWidth() / getHeight();
+        float verticalAspectRatio = (float) getHeight() / getWidth();
+        return new Vector2f(horizontalAspectRatio, verticalAspectRatio);
     }
 }
