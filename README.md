@@ -32,8 +32,8 @@ Include the generated JAR file in your project's dependencies:
 </dependency>
 ```
 
-📄 License
+## 📄 License
 This project is open-source and available under the MIT License.​
 
-🤝 Contributing
+## 🤝 Contributing
 Contributions are welcome! Feel free to open issues or submit pull requests to enhance the functionality or fix bugs.
