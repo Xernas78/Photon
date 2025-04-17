@@ -66,6 +66,11 @@ public interface IWindow extends Initializable {
     void stop();
 
     default float getAspectRatio() {
-        return getWidth() / (float) getHeight();
+        if (getWidth() > getHeight()) {
+            return (float) getWidth() / (float) getHeight();
+        }
+        else {
+            return (float) getHeight() / (float) getWidth();
+        }
     }
 }
