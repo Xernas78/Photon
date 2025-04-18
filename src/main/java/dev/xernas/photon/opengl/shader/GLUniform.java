@@ -2,10 +2,7 @@ package dev.xernas.photon.opengl.shader;
 
 import dev.xernas.photon.render.shader.IUniform;
 import lombok.Getter;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
+import org.joml.*;
 import org.lwjgl.system.MemoryStack;
 
 import java.awt.*;
@@ -45,6 +42,10 @@ public class GLUniform<T> implements IUniform<T> {
                 glUniform3f(location, v.x, v.y, v.z);
             } else if (value instanceof Vector2f v) {
                 glUniform2f(location, v.x, v.y);
+            } else if (value instanceof Vector2i v) {
+                glUniform2i(location, v.x, v.y);
+            } else if (value instanceof Vector3i v) {
+                glUniform3i(location, v.x, v.y, v.z);
             } else if (value instanceof Color color) {
                 glUniform3f(location, color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
             } else {
