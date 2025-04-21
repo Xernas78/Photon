@@ -3,7 +3,7 @@ package dev.xernas.photon.opengl;
 import dev.xernas.photon.input.Action;
 import dev.xernas.photon.input.Input;
 import dev.xernas.photon.input.Key;
-import dev.xernas.photon.utils.PhotonImage;
+import dev.xernas.photon.render.ITexture;
 import dev.xernas.photon.window.WindowHints;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.window.IWindow;
@@ -101,7 +101,7 @@ public class GLWindow implements IWindow {
         hints.applyOGL();
         maximized = hints.isMaximized();
 
-        PhotonImage icon = hints.getIcon();
+        GLTexture icon = (GLTexture) hints.getIcon();
         if (icon != null) {
             ByteBuffer iconBuffer = icon.getData();
             GLFWImage.Buffer iconBufferStruct = GLFWImage.malloc(1);

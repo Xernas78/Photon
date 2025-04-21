@@ -1,6 +1,9 @@
 package dev.xernas.photon.utils;
 
+import dev.xernas.photon.Lib;
 import dev.xernas.photon.exceptions.PhotonException;
+import dev.xernas.photon.opengl.GLTexture;
+import dev.xernas.photon.render.ITexture;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.stb.STBImage;
@@ -16,7 +19,7 @@ import java.nio.file.Path;
 
 public class GlobalUtilitaries {
 
-    public static PhotonImage loadImage(Path iconPath) throws PhotonException {
+    public static ITexture loadTextureByLib(Lib lib, Path iconPath) throws PhotonException {
         int width, height;
         ByteBuffer imageBuffer;
 
@@ -42,7 +45,10 @@ public class GlobalUtilitaries {
                 width = widthBuffer.get();
                 height = heightBuffer.get();
 
-                return new PhotonImage(width, height, buffer);
+                return switch (lib) {
+                    case OPENGL -> new GLTexture(width, height, buffer);
+                    default -> throw new PhotonException("Unsupported library type: " + lib);
+                };
             }
         } catch (IOException e) {
             throw new PhotonException("Error loading image file: " + iconPath);
