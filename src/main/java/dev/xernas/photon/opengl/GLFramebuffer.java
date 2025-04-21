@@ -13,8 +13,9 @@ public class GLFramebuffer implements IFramebuffer, IBindeable {
     private int width;
     private int height;
 
-    public GLFramebuffer() {
-
+    public GLFramebuffer(int width, int height) {
+        this.width = width;
+        this.height = height;
     }
 
     @Override
