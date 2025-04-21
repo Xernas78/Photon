@@ -7,6 +7,7 @@ import dev.xernas.photon.input.Key;
 import org.joml.Vector2f;
 
 import java.awt.*;
+import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
@@ -29,6 +30,8 @@ public interface IWindow extends Initializable {
     int getWidth();
 
     int getHeight();
+
+    void setOnResize(Consumer<IWindow> onResize);
 
     void resize(int width, int height);
 
