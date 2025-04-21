@@ -47,13 +47,13 @@ public class GLMesh implements IMesh, IBindeable {
         vao = new VAO();
         vao.init();
         materialTexture = material.getTexture();
+        hasTexture = textureCoords != null && materialTexture != null;
+        if (hasTexture) materialTexture.init();
         bind();
         indicesBuffer = vao.storeIndicesBuffer(indices);
         verticesBuffer = vao.storeDataInAttributeList(0, 3, vertices);
         normalsBuffer = normals == null ? null : vao.storeDataInAttributeList(1, 3, normals);
         textureCoordsBuffer = textureCoords == null ? null : vao.storeDataInAttributeList(2, 2, textureCoords);
-        hasTexture = textureCoords != null && materialTexture != null;
-        if (hasTexture) materialTexture.init();
         unbind();
     }
 

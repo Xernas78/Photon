@@ -73,7 +73,7 @@ public class GLTexture implements ITexture, IBindeable {
 
     @Override
     public void init() throws PhotonException {
-        int textureID = GlobalUtilitaries.requireNotEquals(glGenTextures(), 0, "Error creating texture");
+        textureID = GlobalUtilitaries.requireNotEquals(glGenTextures(), 0, "Error creating texture");
         glBindTexture(GL_TEXTURE_2D, textureID);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         if (data != null) glTexImage2D(GL_TEXTURE_2D, 0, alpha ? GL_RGBA : GL_RGB, width, height, 0, alpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
