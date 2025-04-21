@@ -70,6 +70,10 @@ public class GLRenderer {
         glActiveTexture(boundTextureUnit);
     }
 
+    public static void bindTexture(int textureId) {
+        glBindTexture(GL_TEXTURE_2D, textureId);
+    }
+
     public static void clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }

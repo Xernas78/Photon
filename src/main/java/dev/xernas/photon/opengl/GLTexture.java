@@ -89,7 +89,7 @@ public class GLTexture implements ITexture, IBindeable {
     @Override
     public void bind() {
         GLRenderer.useBoundTextureUnit();
-        glBindTexture(GL_TEXTURE_2D, textureID);
+        GLRenderer.bindTexture(textureID);
     }
 
     @Override
