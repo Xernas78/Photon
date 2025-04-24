@@ -2,12 +2,14 @@ package dev.xernas.photon.opengl;
 
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.render.IFramebuffer;
+import lombok.Getter;
 
 import static org.lwjgl.opengl.GL30.*;
 
 public class GLFramebuffer implements IFramebuffer, IBindeable {
 
     private int framebufferID;
+    @Getter
     private GLTexture attachedTexture;
     private int renderbufferID;
     private int width;
@@ -60,8 +62,6 @@ public class GLFramebuffer implements IFramebuffer, IBindeable {
         // Update the width and height
         this.width = width;
         this.height = height;
-
-        if (attachedTexture != null) attachedTexture.resize(width, height);
 
         storeAttachments();
     }

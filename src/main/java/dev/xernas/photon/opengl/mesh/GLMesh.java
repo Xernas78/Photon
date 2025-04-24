@@ -8,6 +8,7 @@ import dev.xernas.photon.render.IMesh;
 import dev.xernas.photon.render.ITexture;
 import dev.xernas.photon.render.shader.Material;
 import lombok.Getter;
+import lombok.Setter;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
@@ -63,7 +64,7 @@ public class GLMesh implements IMesh, IBindeable {
         if (hasTexture()) materialTexture.use();
         GLRenderer.enableVertexAttribArray(0);
         if (hasNormals()) GLRenderer.enableVertexAttribArray(1);
-        if (hasTexture()) GLRenderer.enableVertexAttribArray(2);
+        if (textureCoords != null) GLRenderer.enableVertexAttribArray(2);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class GLMesh implements IMesh, IBindeable {
         if (hasTexture()) materialTexture.disuse();
         GLRenderer.disableVertexAttribArray(0);
         if (hasNormals()) GLRenderer.disableVertexAttribArray(1);
-        if (hasTexture()) GLRenderer.disableVertexAttribArray(2);
+        if (textureCoords != null) GLRenderer.disableVertexAttribArray(2);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class GLMesh implements IMesh, IBindeable {
         MemoryUtil.memFree(verticesBuffer);
         MemoryUtil.memFree(indicesBuffer);
         if (hasNormals()) MemoryUtil.memFree(normalsBuffer);
-        if (hasTexture()) MemoryUtil.memFree(textureCoordsBuffer);
+        if (textureCoords != null) MemoryUtil.memFree(textureCoordsBuffer);
     }
 
     @Override
@@ -117,6 +118,17 @@ public class GLMesh implements IMesh, IBindeable {
     @Override
     public Material getMaterial() {
         return material;
+    }
+
+    @Override
+    public void updateTexture(ITexture texture) {
+        if (texture != null) {
+            hasTexture = true;
+            materialTexture = texture;
+        } else {
+            hasTexture = false;
+            materialTexture = null;
+        }
     }
 
     @Getter
