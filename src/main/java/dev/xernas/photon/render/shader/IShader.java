@@ -10,6 +10,8 @@ public interface IShader extends IUseable {
 
     boolean hasLightingSystem();
 
+    boolean hasPostProcessing();
+
     <T> boolean setUniform(String name, T value) throws PhotonException;
 
     boolean hasUniform(String name) throws PhotonException;

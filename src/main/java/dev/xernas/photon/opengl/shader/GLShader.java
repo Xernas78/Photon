@@ -24,14 +24,16 @@ public class GLShader implements IShader, IBindeable {
 
     private final String name;
     private final boolean hasLightingSystem;
+    private final boolean hasPostProcessing;
     @Getter
     private final String vertexCode;
     @Getter
     private final String fragmentCode;
 
-    public GLShader(String name, boolean hasLightingSystem, String vertexCode, String fragmentCode) {
+    public GLShader(String name, boolean hasLightingSystem, boolean hasPostProcessing, String vertexCode, String fragmentCode) {
         this.name = name;
         this.hasLightingSystem = hasLightingSystem;
+        this.hasPostProcessing = hasPostProcessing;
         this.vertexCode = vertexCode;
         this.fragmentCode = fragmentCode;
     }
@@ -44,6 +46,11 @@ public class GLShader implements IShader, IBindeable {
     @Override
     public boolean hasLightingSystem() {
         return hasLightingSystem;
+    }
+
+    @Override
+    public boolean hasPostProcessing() {
+        return hasPostProcessing;
     }
 
     @Override

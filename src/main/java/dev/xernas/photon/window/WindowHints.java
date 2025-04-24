@@ -1,6 +1,6 @@
 package dev.xernas.photon.window;
 
-import dev.xernas.photon.utils.PhotonImage;
+import dev.xernas.photon.render.ITexture;
 import lombok.Getter;
 import lombok.Setter;
 import org.lwjgl.glfw.GLFW;
@@ -9,7 +9,7 @@ import org.lwjgl.glfw.GLFW;
 @Setter
 public class WindowHints {
 
-    private PhotonImage icon;
+    private ITexture icon;
     private boolean resizable;
     private boolean visible;
     private boolean decorated;
@@ -21,11 +21,11 @@ public class WindowHints {
         this(null, true, false, true, false, false, true);
     }
 
-    public WindowHints(PhotonImage icon) {
+    public WindowHints(ITexture icon) {
         this(icon, true, false, true, false, false, true);
     }
 
-    public WindowHints(PhotonImage icon, boolean resizable, boolean visible, boolean decorated, boolean vsync, boolean maximized, boolean isAzerty) {
+    public WindowHints(ITexture icon, boolean resizable, boolean visible, boolean decorated, boolean vsync, boolean maximized, boolean isAzerty) {
         this.icon = icon;
         this.resizable = resizable;
         this.visible = visible;

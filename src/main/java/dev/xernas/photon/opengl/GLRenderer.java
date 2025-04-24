@@ -6,10 +6,15 @@ import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 
 public class GLRenderer {
+
+    @Getter
+    private static int boundTextureUnit = GL_TEXTURE0;
 
     @Getter
     private static boolean depthTest = true;
@@ -55,6 +60,18 @@ public class GLRenderer {
 
     public static void disableVertexAttribArray(int attribute) {
         glDisableVertexAttribArray(attribute);
+    }
+
+    public static void setBoundTextureUnit(int unitId) {
+        GLRenderer.boundTextureUnit = GL_TEXTURE0 + unitId;
+    }
+
+    public static void useBoundTextureUnit() {
+        glActiveTexture(boundTextureUnit);
+    }
+
+    public static void bindTexture(int textureId) {
+        glBindTexture(GL_TEXTURE_2D, textureId);
     }
 
     public static void clear() {

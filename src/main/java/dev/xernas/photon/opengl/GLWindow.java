@@ -3,7 +3,7 @@ package dev.xernas.photon.opengl;
 import dev.xernas.photon.input.Action;
 import dev.xernas.photon.input.Input;
 import dev.xernas.photon.input.Key;
-import dev.xernas.photon.utils.PhotonImage;
+import dev.xernas.photon.render.ITexture;
 import dev.xernas.photon.window.WindowHints;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.window.IWindow;
@@ -40,6 +40,7 @@ public class GLWindow implements IWindow {
     private final WindowHints hints;
     private final Input input;
     private final List<Long> monitors = new ArrayList<>();
+    private final List<Consumer<IWindow>> onResize = new ArrayList<>();
 
     private int lastMonitorIndex = 0;
     private boolean maximized = false;
@@ -82,7 +83,7 @@ public class GLWindow implements IWindow {
         GLFW.glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> {
             if (width == 0 || height == 0) return;
             resize(width, height);
-            List<Consumer<IWindow>> onResize = input.getOnResize();
+            List<Consumer<IWindow>> onResize = getOnResize();
             for (Consumer<IWindow> consumer : onResize) consumer.accept(this);
         });
         // Keyboard
@@ -101,7 +102,7 @@ public class GLWindow implements IWindow {
         hints.applyOGL();
         maximized = hints.isMaximized();
 
-        PhotonImage icon = hints.getIcon();
+        GLTexture icon = (GLTexture) hints.getIcon();
         if (icon != null) {
             ByteBuffer iconBuffer = icon.getData();
             GLFWImage.Buffer iconBufferStruct = GLFWImage.malloc(1);
@@ -229,6 +230,11 @@ public class GLWindow implements IWindow {
     public void setTitle(String title) {
         this.title = title;
         GLFW.glfwSetWindowTitle(windowHandle, title);
+    }
+
+    @Override
+    public void setOnResize(Consumer<IWindow> onResize) {
+        this.onResize.add(onResize);
     }
 
     @Override

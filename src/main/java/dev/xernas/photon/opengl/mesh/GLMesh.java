@@ -4,11 +4,11 @@ import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.opengl.IBindeable;
 import dev.xernas.photon.opengl.GLRenderer;
 import dev.xernas.photon.opengl.utils.BufferUtils;
-import dev.xernas.photon.opengl.utils.GLUtils;
 import dev.xernas.photon.render.IMesh;
+import dev.xernas.photon.render.ITexture;
 import dev.xernas.photon.render.shader.Material;
-import dev.xernas.photon.utils.PhotonImage;
 import lombok.Getter;
+import lombok.Setter;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
@@ -32,9 +32,8 @@ public class GLMesh implements IMesh, IBindeable {
     private FloatBuffer verticesBuffer;
     private FloatBuffer normalsBuffer;
     private FloatBuffer textureCoordsBuffer;
-    private int textureID;
     private boolean hasTexture;
-    private PhotonImage materialTexture;
+    private ITexture materialTexture;
 
     public GLMesh(float[] vertices, int[] indices, float[] normals, float[] textureCoords, Material material) {
         this.vertices = vertices;
@@ -49,42 +48,42 @@ public class GLMesh implements IMesh, IBindeable {
         vao = new VAO();
         vao.init();
         materialTexture = material.getTexture();
+        hasTexture = textureCoords != null && materialTexture != null;
+        if (hasTexture) materialTexture.init();
         bind();
         indicesBuffer = vao.storeIndicesBuffer(indices);
         verticesBuffer = vao.storeDataInAttributeList(0, 3, vertices);
         normalsBuffer = normals == null ? null : vao.storeDataInAttributeList(1, 3, normals);
         textureCoordsBuffer = textureCoords == null ? null : vao.storeDataInAttributeList(2, 2, textureCoords);
-        textureID = materialTexture == null ? 0 : GLUtils.loadTexture(materialTexture);
-        hasTexture = textureID != 0 && textureCoords != null && materialTexture != null;
         unbind();
     }
 
     @Override
     public void bind() {
         vao.bind();
-        if (hasTexture()) glBindTexture(GL_TEXTURE_2D, textureID);
+        if (hasTexture()) materialTexture.use();
         GLRenderer.enableVertexAttribArray(0);
         if (hasNormals()) GLRenderer.enableVertexAttribArray(1);
-        if (hasTexture()) GLRenderer.enableVertexAttribArray(2);
+        if (textureCoords != null) GLRenderer.enableVertexAttribArray(2);
     }
 
     @Override
     public void unbind() {
         vao.unbind();
-        if (hasTexture()) glBindTexture(GL_TEXTURE_2D, 0);
+        if (hasTexture()) materialTexture.disuse();
         GLRenderer.disableVertexAttribArray(0);
         if (hasNormals()) GLRenderer.disableVertexAttribArray(1);
-        if (hasTexture()) GLRenderer.disableVertexAttribArray(2);
+        if (textureCoords != null) GLRenderer.disableVertexAttribArray(2);
     }
 
     @Override
     public void cleanup() {
         vao.cleanup();
-        if (hasTexture()) glDeleteTextures(textureID);
+        if (hasTexture()) materialTexture.dispose();
         MemoryUtil.memFree(verticesBuffer);
         MemoryUtil.memFree(indicesBuffer);
         if (hasNormals()) MemoryUtil.memFree(normalsBuffer);
-        if (hasTexture()) MemoryUtil.memFree(textureCoordsBuffer);
+        if (textureCoords != null) MemoryUtil.memFree(textureCoordsBuffer);
     }
 
     @Override
@@ -119,6 +118,17 @@ public class GLMesh implements IMesh, IBindeable {
     @Override
     public Material getMaterial() {
         return material;
+    }
+
+    @Override
+    public void updateTexture(ITexture texture) {
+        if (texture != null) {
+            hasTexture = true;
+            materialTexture = texture;
+        } else {
+            hasTexture = false;
+            materialTexture = null;
+        }
     }
 
     @Getter

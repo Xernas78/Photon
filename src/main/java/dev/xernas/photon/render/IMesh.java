@@ -12,4 +12,6 @@ public interface IMesh extends IUseable {
 
     Material getMaterial();
 
+    void updateTexture(ITexture texture);
+
 }
