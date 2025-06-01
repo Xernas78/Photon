@@ -67,4 +67,16 @@ public class Input {
     public boolean isAzerty() {
         return azerty;
     }
+
+    public IWindow getWindow() {
+        return window;
+    }
+
+    public MousePosition getMousePosition() {
+        return mousePosition;
+    }
+
+    public MousePosition getAbsoluteMousePosition() {
+        return absoluteMousePosition;
+    }
 }
