@@ -2,13 +2,9 @@ package dev.xernas.photon.input;
 
 import dev.xernas.photon.window.IWindow;
 import lombok.Getter;
-import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 @Getter
 public class Input {

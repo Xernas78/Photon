@@ -31,8 +31,6 @@ public interface IWindow extends Initializable {
 
     int getHeight();
 
-    void setOnResize(Consumer<IWindow> onResize);
-
     void resize(int width, int height);
 
     boolean isKeyPressed(Key key);

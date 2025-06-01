@@ -40,7 +40,6 @@ public class GLWindow implements IWindow {
     private final WindowHints hints;
     private final Input input;
     private final List<Long> monitors = new ArrayList<>();
-    private final List<Consumer<IWindow>> onResize = new ArrayList<>();
 
     private int lastMonitorIndex = 0;
     private boolean maximized = false;
@@ -83,8 +82,6 @@ public class GLWindow implements IWindow {
         GLFW.glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> {
             if (width == 0 || height == 0) return;
             resize(width, height);
-            List<Consumer<IWindow>> onResize = getOnResize();
-            for (Consumer<IWindow> consumer : onResize) consumer.accept(this);
         });
         // Keyboard
         GLFW.glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> input.setKeyAction(Key.fromCode(key, input.isAzerty()), Action.fromCode(action)));
@@ -230,11 +227,6 @@ public class GLWindow implements IWindow {
     public void setTitle(String title) {
         this.title = title;
         GLFW.glfwSetWindowTitle(windowHandle, title);
-    }
-
-    @Override
-    public void setOnResize(Consumer<IWindow> onResize) {
-        this.onResize.add(onResize);
     }
 
     @Override
