@@ -5,7 +5,6 @@ import dev.xernas.photon.opengl.IBindeable;
 import dev.xernas.photon.opengl.exceptions.OpenGLException;
 import dev.xernas.photon.render.shader.IShader;
 import dev.xernas.photon.utils.GlobalUtilitaries;
-import lombok.Getter;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.system.MemoryStack;
 
@@ -14,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL41.glShaderBinary;
 
 public class GLShader implements IShader, IBindeable {
 
@@ -25,9 +23,7 @@ public class GLShader implements IShader, IBindeable {
     private final String name;
     private final boolean hasLightingSystem;
     private final boolean hasPostProcessing;
-    @Getter
     private final String vertexCode;
-    @Getter
     private final String fragmentCode;
 
     public GLShader(String name, boolean hasLightingSystem, boolean hasPostProcessing, String vertexCode, String fragmentCode) {

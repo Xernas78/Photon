@@ -3,11 +3,9 @@ package dev.xernas.photon.opengl;
 import dev.xernas.photon.input.Action;
 import dev.xernas.photon.input.Input;
 import dev.xernas.photon.input.Key;
-import dev.xernas.photon.render.ITexture;
 import dev.xernas.photon.window.WindowHints;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.window.IWindow;
-import lombok.Getter;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
@@ -28,7 +26,6 @@ import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 
-@Getter
 public class GLWindow implements IWindow {
 
     private long windowHandle;
@@ -137,6 +134,11 @@ public class GLWindow implements IWindow {
     }
 
     @Override
+    public String getTitle() {
+        return title;
+    }
+
+    @Override
     public String getDefaultTitle() {
         return defaultTitle;
     }
@@ -230,6 +232,16 @@ public class GLWindow implements IWindow {
     }
 
     @Override
+    public int getWidth() {
+        return width;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
     public void resize(int width, int height) {
         this.width = width;
         this.height = height;
@@ -245,6 +257,16 @@ public class GLWindow implements IWindow {
     @Override
     public boolean isMouseButtonPressed(Key button) {
         return GLFW.glfwGetMouseButton(windowHandle, button.getQwerty()) == GLFW_PRESS;
+    }
+
+    @Override
+    public WindowHints getHints() {
+        return hints;
+    }
+
+    @Override
+    public Input getInput() {
+        return input;
     }
 
     @Override

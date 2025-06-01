@@ -1,10 +1,8 @@
 package dev.xernas.photon.input;
 
 import dev.xernas.photon.window.IWindow;
-import lombok.Getter;
 import org.joml.Vector2f;
 
-@Getter
 public class MousePosition {
 
     private float x;

@@ -1,7 +1,5 @@
 package dev.xernas.photon.opengl;
 
-import lombok.Getter;
-
 import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -13,12 +11,9 @@ import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 
 public class GLRenderer {
 
-    @Getter
     private static int boundTextureUnit = GL_TEXTURE0;
 
-    @Getter
     private static boolean depthTest = true;
-    @Getter
     private static boolean wireFrame = false;
 
     public static void drawElements(int indicesCount) {

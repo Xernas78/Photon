@@ -1,12 +1,8 @@
 package dev.xernas.photon.window;
 
 import dev.xernas.photon.render.ITexture;
-import lombok.Getter;
-import lombok.Setter;
 import org.lwjgl.glfw.GLFW;
 
-@Getter
-@Setter
 public class WindowHints {
 
     private ITexture icon;
@@ -57,4 +53,31 @@ public class WindowHints {
         GLFW.glfwWindowHint(GLFW.GLFW_CLIENT_API, GLFW.GLFW_NO_API);
     }
 
+    public ITexture getIcon() {
+        return icon;
+    }
+
+    public boolean isAzerty() {
+        return isAzerty;
+    }
+
+    public boolean isDecorated() {
+        return decorated;
+    }
+
+    public boolean isMaximized() {
+        return maximized;
+    }
+
+    public boolean isResizable() {
+        return resizable;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public boolean isVsync() {
+        return vsync;
+    }
 }

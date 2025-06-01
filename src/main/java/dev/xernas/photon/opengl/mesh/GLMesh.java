@@ -7,8 +7,6 @@ import dev.xernas.photon.opengl.utils.BufferUtils;
 import dev.xernas.photon.render.IMesh;
 import dev.xernas.photon.render.ITexture;
 import dev.xernas.photon.render.shader.Material;
-import lombok.Getter;
-import lombok.Setter;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
@@ -131,7 +129,6 @@ public class GLMesh implements IMesh, IBindeable {
         }
     }
 
-    @Getter
     public static class VAO implements IBindeable {
 
         private int id;
@@ -184,7 +181,6 @@ public class GLMesh implements IMesh, IBindeable {
             return buffer;
         }
 
-        @Getter
         public static class VBO implements IBindeable {
 
             private int id;

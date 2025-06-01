@@ -1,12 +1,10 @@
 package dev.xernas.photon.input;
 
 import dev.xernas.photon.window.IWindow;
-import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Getter
 public class Input {
 
     private final IWindow window;
@@ -64,5 +62,9 @@ public class Input {
 
     public void setAbsoluteMousePosition(double x, double y) {
         absoluteMousePosition.set((float) x, (float) y);
+    }
+
+    public boolean isAzerty() {
+        return azerty;
     }
 }

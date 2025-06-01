@@ -1,7 +1,6 @@
 package dev.xernas.photon.opengl.shader;
 
 import dev.xernas.photon.render.shader.IUniform;
-import lombok.Getter;
 import org.joml.*;
 import org.lwjgl.system.MemoryStack;
 
@@ -11,9 +10,7 @@ import static org.lwjgl.opengl.GL20.*;
 
 public class GLUniform<T> implements IUniform<T> {
 
-    @Getter
     private final String name;
-    @Getter
     private final int location;
 
     private T value;
@@ -56,6 +53,16 @@ public class GLUniform<T> implements IUniform<T> {
 
     public T get() {
         return value;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public int getLocation() {
+        return location;
     }
 
 }

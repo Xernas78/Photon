@@ -3,23 +3,19 @@ package dev.xernas.photon.opengl;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.render.ITexture;
 import dev.xernas.photon.utils.GlobalUtilitaries;
-import lombok.Getter;
 import org.lwjgl.stb.STBImage;
 
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
 public class GLTexture implements ITexture, IBindeable {
 
-    @Getter
     private int textureID;
     private int width;
     private int height;
-    @Getter
     private final ByteBuffer data;
     private final boolean alpha;
     private final boolean clampToEdge;
@@ -102,4 +98,11 @@ public class GLTexture implements ITexture, IBindeable {
         glDeleteTextures(textureID);
     }
 
+    public int getTextureID() {
+        return textureID;
+    }
+
+    public ByteBuffer getData() {
+        return data;
+    }
 }
