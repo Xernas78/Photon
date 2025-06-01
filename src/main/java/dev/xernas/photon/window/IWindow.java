@@ -37,6 +37,16 @@ public interface IWindow extends Initializable {
 
     boolean isMouseButtonPressed(Key button);
 
+    void setCursorPosition(int x, int y);
+
+    void disableCursor();
+
+    void hideCursor();
+
+    void showCursor();
+
+    void setCursorLocked(boolean locked);
+
     WindowHints getHints();
 
     Input getInput();

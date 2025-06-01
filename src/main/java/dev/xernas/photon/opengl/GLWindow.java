@@ -40,6 +40,7 @@ public class GLWindow implements IWindow {
 
     private int lastMonitorIndex = 0;
     private boolean maximized = false;
+    private boolean cursorLocked = false;
 
     public GLWindow(String title, int width, int height, WindowHints hints) {
         this.defaultTitle = title;
@@ -87,6 +88,7 @@ public class GLWindow implements IWindow {
 
         GLFW.glfwSetCursorPosCallback(windowHandle, (window, xpos, ypos) -> {
             input.setMousePosition(xpos, ypos);
+            if (cursorLocked) setCursorPosition(width / 2, height / 2);
         });
 
         GLFW.glfwSetWindowMaximizeCallback(windowHandle, (window, maximized) -> {
@@ -257,6 +259,31 @@ public class GLWindow implements IWindow {
     @Override
     public boolean isMouseButtonPressed(Key button) {
         return GLFW.glfwGetMouseButton(windowHandle, button.getQwerty()) == GLFW_PRESS;
+    }
+
+    @Override
+    public void setCursorPosition(int x, int y) {
+        GLFW.glfwSetCursorPos(windowHandle, x, y);
+    }
+
+    @Override
+    public void disableCursor() {
+        GLFW.glfwSetInputMode(windowHandle, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+    }
+
+    @Override
+    public void hideCursor() {
+        GLFW.glfwSetInputMode(windowHandle, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
+    }
+
+    @Override
+    public void showCursor() {
+        GLFW.glfwSetInputMode(windowHandle, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+    }
+
+    @Override
+    public void setCursorLocked(boolean locked) {
+        cursorLocked = locked;
     }
 
     @Override
