@@ -12,6 +12,7 @@ import org.lwjgl.system.MemoryUtil;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL30.*;
@@ -104,6 +105,11 @@ public class GLMesh implements IMesh, IBindeable {
     }
 
     @Override
+    public int getId() {
+        return vao.id;
+    }
+
+    @Override
     public boolean hasNormals() {
         return normals != null;
     }
@@ -111,6 +117,18 @@ public class GLMesh implements IMesh, IBindeable {
     @Override
     public boolean hasTexture() {
         return hasTexture;
+    }
+
+    @Override
+    public boolean is(IMesh mesh) {
+        GLMesh glMesh = (GLMesh) mesh;
+        if (glMesh == null) return false;
+
+        return Arrays.equals(glMesh.vertices, vertices)
+                && Arrays.equals(glMesh.indices, indices)
+                && Arrays.equals(glMesh.normals, normals)
+                && Arrays.equals(glMesh.textureCoords, textureCoords)
+                && glMesh.materialTexture == materialTexture;
     }
 
     @Override

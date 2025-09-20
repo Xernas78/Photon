@@ -6,9 +6,13 @@ import dev.xernas.photon.render.shader.Material;
 
 public interface IMesh extends IUseable {
 
+    int getId();
+
     boolean hasNormals();
 
     boolean hasTexture();
+
+    boolean is(IMesh mesh);
 
     Material getMaterial();
 

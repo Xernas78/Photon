@@ -3,6 +3,8 @@ package dev.xernas.photon.opengl;
 import dev.xernas.photon.input.Action;
 import dev.xernas.photon.input.Input;
 import dev.xernas.photon.input.Key;
+import dev.xernas.photon.window.Cursor;
+import dev.xernas.photon.window.CursorShape;
 import dev.xernas.photon.window.WindowHints;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.window.IWindow;
@@ -22,7 +24,6 @@ import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 
@@ -33,6 +34,7 @@ public class GLWindow implements IWindow {
     private final String defaultTitle;
     private String title;
     private int width, height;
+    private Cursor currentCursor;
     private Color color = Color.BLACK;
     private final WindowHints hints;
     private final Input input;
@@ -113,6 +115,9 @@ public class GLWindow implements IWindow {
             iconBufferStruct.free();
             iconImage.free();
         }
+
+        currentCursor = new Cursor(CursorShape.ARROW);
+        currentCursor.init();
     }
 
     @Override
@@ -158,6 +163,7 @@ public class GLWindow implements IWindow {
     @Override
     public void stop() {
         close();
+        currentCursor.cleanup();
         Callbacks.glfwFreeCallbacks(windowHandle);
         GLFW.glfwDestroyWindow(windowHandle);
     }
@@ -284,6 +290,14 @@ public class GLWindow implements IWindow {
     @Override
     public void setCursorLocked(boolean locked) {
         cursorLocked = locked;
+    }
+
+    @Override
+    public void setCursorShape(CursorShape shape) throws PhotonException {
+        currentCursor.cleanup();
+        currentCursor = new Cursor(shape);
+        currentCursor.init();
+        GLFW.glfwSetCursor(windowHandle, currentCursor.getHandle());
     }
 
     @Override

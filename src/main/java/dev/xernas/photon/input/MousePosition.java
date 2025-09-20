@@ -28,7 +28,7 @@ public class MousePosition {
         } else {
             return new Vector2f(
                     (x / window.getWidth()) * 2 - 1,
-                    (1 - (y / window.getHeight()) * 2) / aspect
+                    (1 - (y / window.getHeight()) * 2) * aspect
             );
         }
     }
@@ -39,5 +39,13 @@ public class MousePosition {
 
     public float getY() {
         return y;
+    }
+
+    @Override
+    public String toString() {
+        return "MousePosition{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
     }
 }

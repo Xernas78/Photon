@@ -7,10 +7,6 @@ import dev.xernas.photon.input.Key;
 import org.joml.Vector2f;
 
 import java.awt.*;
-import java.util.function.Consumer;
-
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 
 public interface IWindow extends Initializable {
 
@@ -46,6 +42,8 @@ public interface IWindow extends Initializable {
     void showCursor();
 
     void setCursorLocked(boolean locked);
+
+    void setCursorShape(CursorShape mode) throws PhotonException;
 
     WindowHints getHints();
 
