@@ -1,6 +1,5 @@
-package dev.xernas.photon.window;
+package dev.xernas.photon.api.window;
 
-import dev.xernas.photon.Library;
 import dev.xernas.photon.PhotonAPI;
 import dev.xernas.photon.api.PhotonLogic;
 import dev.xernas.photon.api.Renderer;
@@ -9,7 +8,6 @@ import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
@@ -27,6 +25,7 @@ public class Window implements PhotonLogic {
 
     private long handle;
     private GLFWErrorCallback errorCallback;
+    private boolean framebufferResized = false;
 
     public Window(String title, int width, int height) {
         this(true, false, title, width, height);
@@ -74,6 +73,7 @@ public class Window implements PhotonLogic {
 
         // Callbacks
         GLFW.glfwSetFramebufferSizeCallback(handle, (window, w, h) -> {
+            setFramebufferResized(true);
             this.width = w;
             this.height = h;
         });
@@ -95,7 +95,7 @@ public class Window implements PhotonLogic {
         }
     }
 
-    public void update(Renderer renderer) {
+    public void update(Renderer renderer) throws PhotonException {
         renderer.swapBuffers();
         GLFW.glfwPollEvents();
     }
@@ -133,6 +133,14 @@ public class Window implements PhotonLogic {
 
     public boolean isVsync() {
         return vsync;
+    }
+
+    public boolean framebufferResized() {
+        return framebufferResized;
+    }
+
+    public void setFramebufferResized(boolean framebufferResized) {
+        this.framebufferResized = framebufferResized;
     }
 
     @Override

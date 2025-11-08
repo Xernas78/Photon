@@ -1,15 +1,20 @@
-package dev.xernas.photon.vulkan;
+package dev.xernas.photon.vulkan.swapchain;
 
 import dev.xernas.photon.api.PhotonLogic;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.exceptions.VulkanException;
-import dev.xernas.photon.window.Window;
+import dev.xernas.photon.vulkan.*;
+import dev.xernas.photon.vulkan.device.VulkanDevice;
+import dev.xernas.photon.vulkan.device.VulkanPhysicalDevice;
+import dev.xernas.photon.api.window.Window;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.*;
 
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.vulkan.KHRSurface.VK_PRESENT_MODE_FIFO_KHR;
 
@@ -21,7 +26,12 @@ public class VulkanSwapChain implements PhotonLogic {
     private final VulkanSurface surface;
     private final boolean vsync;
 
+    private final List<VulkanImageView> imageViews = new ArrayList<>();
+
     private long swapChain;
+    private int extentWidth;
+    private int extentHeight;
+    private VkSurfaceFormatKHR surfaceFormat;
 
     public VulkanSwapChain(boolean vsync, Window window, VulkanDevice device, VulkanPhysicalDevice physicalDevice, VulkanSurface surface) {
         this.window = window;
@@ -41,7 +51,7 @@ public class VulkanSwapChain implements PhotonLogic {
             IntBuffer presentModes = swapChainSupportDetails.presentModes;
 
             //Picking a format
-            VkSurfaceFormatKHR chosenSurfaceFormat = pickSurfaceFormat(formats);
+            surfaceFormat = pickSurfaceFormat(formats);
             //Picking a present mode
             int chosenPresentMode = pickPresentMode(presentModes);
 
@@ -56,8 +66,8 @@ public class VulkanSwapChain implements PhotonLogic {
                     .sType(KHRSwapchain.VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR)
                     .surface(surface.getSurface())
                     .minImageCount(imageCount)
-                    .imageFormat(chosenSurfaceFormat.format())
-                    .imageColorSpace(chosenSurfaceFormat.colorSpace())
+                    .imageFormat(surfaceFormat.format())
+                    .imageColorSpace(surfaceFormat.colorSpace())
                     .imageExtent(extent)
                     .imageArrayLayers(1)
                     .imageUsage(VK10.VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
@@ -86,7 +96,7 @@ public class VulkanSwapChain implements PhotonLogic {
 
             LongBuffer pSwapChain = stack.longs(VK10.VK_NULL_HANDLE);
             int err = KHRSwapchain.vkCreateSwapchainKHR(device.getDevice(), createInfo, null, pSwapChain);
-            if (err != VK10.VK_SUCCESS) throw new VulkanException("Failed to create swap chain: " +  err);
+            if (err != VK10.VK_SUCCESS) throw new VulkanException("Failed to create swap chain: " +  VulkanErrorHelper.vkResultToString(err));
             swapChain = pSwapChain.get(0);
 
             // Retrieve swap chain images
@@ -94,13 +104,102 @@ public class VulkanSwapChain implements PhotonLogic {
             KHRSwapchain.vkGetSwapchainImagesKHR(device.getDevice(), swapChain, pImageCount, null);
             LongBuffer swapChainImages = stack.mallocLong(pImageCount.get(0));
             KHRSwapchain.vkGetSwapchainImagesKHR(device.getDevice(), swapChain, pImageCount, swapChainImages);
-            
+
+            // SwapChain image views
+            for (int i = 0; i < swapChainImages.capacity(); i++) {
+                long image = swapChainImages.get(i);
+                VulkanImageView imageView = new VulkanImageView(image, surfaceFormat.format(), device);
+                imageView.start();
+                imageViews.add(imageView);
+            }
         }
     }
 
     @Override
     public void dispose() throws PhotonException {
+        for (VulkanImageView imageView : imageViews) imageView.dispose();
+        imageViews.clear();
         KHRSwapchain.vkDestroySwapchainKHR(device.getDevice(), swapChain, null);
+        swapChain = VK10.VK_NULL_HANDLE;
+    }
+
+    public long getSwapChain() {
+        return swapChain;
+    }
+
+    public int getExtentWidth() {
+        return extentWidth;
+    }
+
+    public int getExtentHeight() {
+        return extentHeight;
+    }
+
+    public VkSurfaceFormatKHR getSurfaceFormat() {
+        return surfaceFormat;
+    }
+
+    public List<VulkanImageView> getImageViews() {
+        return imageViews;
+    }
+
+    public int acquireNextImage(VulkanSynchronisation synchronisation) throws VulkanException {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer pImageIndex = stack.mallocInt(1);
+            int err = KHRSwapchain.vkAcquireNextImageKHR(device.getDevice(), swapChain, Long.MAX_VALUE, synchronisation.getImageAvailableSemaphore(), VK10.VK_NULL_HANDLE, pImageIndex);
+            if (err == KHRSwapchain.VK_ERROR_OUT_OF_DATE_KHR) return -1;
+            if (err != VK10.VK_SUCCESS && err != KHRSwapchain.VK_SUBOPTIMAL_KHR)
+                throw new VulkanException("Failed to acquire swap chain image: " + err);
+            return pImageIndex.get(0);
+        }
+    }
+
+    public void submitCommandBuffer(int imageIndex, VulkanSynchronisation synchronisation, VulkanCommandBuffer commandBuffer) throws VulkanException {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkSubmitInfo submitInfo = VkSubmitInfo.calloc(stack)
+                    .sType(VK10.VK_STRUCTURE_TYPE_SUBMIT_INFO);
+
+            LongBuffer waitSemaphores = stack.longs(synchronisation.getImageAvailableSemaphore());
+            IntBuffer waitStages = stack.ints(VK10.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
+            submitInfo.waitSemaphoreCount(1)
+                    .pWaitSemaphores(waitSemaphores)
+                    .pWaitDstStageMask(waitStages);
+
+            submitInfo.pCommandBuffers(stack.pointers(commandBuffer.getCommandBuffer()));
+
+            LongBuffer signalSemaphores = stack.longs(synchronisation.getRenderFinishedSemaphore());
+            submitInfo.pSignalSemaphores(signalSemaphores);
+
+            synchronisation.waitForFences();
+            synchronisation.resetFences();
+
+            int err = VK10.vkQueueSubmit(device.getGraphicsQueue(), submitInfo, synchronisation.getInFlightFence());
+            if (err != VK10.VK_SUCCESS) throw new VulkanException("Failed to submit draw command buffer: " + VulkanErrorHelper.vkResultToString(err));
+        }
+    }
+
+    public int presentImage(int imageIndex, VulkanSynchronisation synchronisation, VulkanRenderer renderer) throws PhotonException {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkPresentInfoKHR presentInfo = VkPresentInfoKHR.calloc(stack)
+                    .sType(KHRSwapchain.VK_STRUCTURE_TYPE_PRESENT_INFO_KHR);
+
+            LongBuffer waitSemaphores = stack.longs(synchronisation.getRenderFinishedSemaphore());
+            presentInfo.pWaitSemaphores(waitSemaphores);
+
+            LongBuffer swapChains = stack.longs(swapChain);
+            presentInfo.swapchainCount(1)
+                    .pSwapchains(swapChains)
+                    .pImageIndices(stack.ints(imageIndex))
+                    .pResults(null);
+
+            int err = KHRSwapchain.vkQueuePresentKHR(device.getPresentQueue(), presentInfo);
+            if (err == KHRSwapchain.VK_ERROR_OUT_OF_DATE_KHR || err == KHRSwapchain.VK_SUBOPTIMAL_KHR) {
+                return -1;
+            }
+            if (err != VK10.VK_SUCCESS)
+                throw new VulkanException("Failed to present swap chain image: " + VulkanErrorHelper.vkResultToString(err));
+            return 0;
+        }
     }
 
     private VkSurfaceFormatKHR pickSurfaceFormat(VkSurfaceFormatKHR.Buffer availableFormats) {
@@ -125,12 +224,25 @@ public class VulkanSwapChain implements PhotonLogic {
             IntBuffer pWidth = stack.mallocInt(1);
             IntBuffer pHeight = stack.mallocInt(1);
             GLFW.glfwGetFramebufferSize(window.getHandle(), pWidth, pHeight);
-            int width = Math.max(capabilities.minImageExtent().width(),
+            extentWidth = Math.max(capabilities.minImageExtent().width(),
                     Math.min(capabilities.maxImageExtent().width(), pWidth.get(0)));
-            int height = Math.max(capabilities.minImageExtent().height(),
+            extentHeight = Math.max(capabilities.minImageExtent().height(),
                     Math.min(capabilities.maxImageExtent().height(), pHeight.get(0)));
-            extent.width(width).height(height);
+            extent.width(extentWidth).height(extentHeight);
         }
+        return extent;
+    }
+
+    public VkExtent2D getExtent(MemoryStack stack) {
+        VkExtent2D extent = VkExtent2D.malloc(stack);
+        if (extentWidth == 0 || extentHeight == 0) {
+            IntBuffer pWidth = stack.mallocInt(1);
+            IntBuffer pHeight = stack.mallocInt(1);
+            GLFW.glfwGetFramebufferSize(window.getHandle(), pWidth, pHeight);
+            extentWidth = pWidth.get(0);
+            extentHeight = pHeight.get(0);
+        }
+        extent.width(extentWidth).height(extentHeight);
         return extent;
     }
 

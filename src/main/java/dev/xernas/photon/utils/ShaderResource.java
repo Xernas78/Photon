@@ -1,4 +1,5 @@
 package dev.xernas.photon.utils;
 
-public class ShaderResource {
+public record ShaderResource(String filename, String shaderCode) {
+
 }

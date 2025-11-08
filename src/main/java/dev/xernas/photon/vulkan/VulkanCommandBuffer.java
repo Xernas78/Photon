@@ -3,39 +3,42 @@ package dev.xernas.photon.vulkan;
 import dev.xernas.photon.api.PhotonLogic;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.vulkan.device.VulkanDevice;
+import dev.xernas.photon.vulkan.swapchain.VulkanFramebuffers;
+import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
+import org.lwjgl.vulkan.VkCommandBuffer;
 import org.lwjgl.vulkan.VkCommandBufferAllocateInfo;
 
-public class VulkanCommand implements PhotonLogic {
+import java.util.ArrayList;
+import java.util.List;
 
-    private final VulkanCommandPool commandPool;
+public class VulkanCommandBuffer implements PhotonLogic {
+
+    private final long commandBufferHandle;
     private final VulkanDevice device;
 
-    public VulkanCommand(VulkanCommandPool commandPool, VulkanDevice device) {
-        this.commandPool = commandPool;
+    private VkCommandBuffer commandBuffer;
+
+    public VulkanCommandBuffer(long commandBufferHandle, VulkanDevice device) {
+        this.commandBufferHandle = commandBufferHandle;
         this.device = device;
     }
 
     @Override
     public void start() throws PhotonException {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-
-            VkCommandBufferAllocateInfo allocInfo = VkCommandBufferAllocateInfo.calloc(stack)
-                    .sType(VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO)
-                    .commandPool(commandPool.getCommandPool())
-                    .level(VK10.VK_COMMAND_BUFFER_LEVEL_PRIMARY)
-                    .commandBufferCount(1);
-
-            if (VK10.vkAllocateCommandBuffers(device, allocInfo, ) != VK10.VK_SUCCESS) {
-                throw new PhotonException("Failed to allocate command buffers");
-            }
+            commandBuffer = new VkCommandBuffer(commandBufferHandle, device.getDevice());
         }
     }
 
     @Override
     public void dispose() throws PhotonException {
 
+    }
+
+    public VkCommandBuffer getCommandBuffer() {
+        return commandBuffer;
     }
 
 }

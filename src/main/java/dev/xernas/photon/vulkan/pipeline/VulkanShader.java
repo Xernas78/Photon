@@ -1,5 +1,6 @@
 package dev.xernas.photon.vulkan.pipeline;
 
+import dev.xernas.photon.api.IShader;
 import dev.xernas.photon.api.Shader;
 import dev.xernas.photon.api.ShaderModule;
 import dev.xernas.photon.exceptions.PhotonException;
@@ -8,7 +9,7 @@ import dev.xernas.photon.utils.ShaderResource;
 import dev.xernas.photon.utils.ShaderType;
 import dev.xernas.photon.vulkan.device.VulkanDevice;
 
-public class VulkanShader implements Shader {
+public class VulkanShader implements IShader {
 
     private final ShaderResource vertexResource;
     private final ShaderResource fragmentResource;
@@ -17,9 +18,9 @@ public class VulkanShader implements Shader {
     private VulkanShaderModule vertexShaderModule;
     private VulkanShaderModule fragmentShaderModule;
 
-    public VulkanShader(ShaderResource vertexResource, ShaderResource fragmentResource, VulkanDevice device) {
-        this.vertexResource = vertexResource;
-        this.fragmentResource = fragmentResource;
+    public VulkanShader(Shader shader, VulkanDevice device) {
+        this.vertexResource = shader.getVertexResource();
+        this.fragmentResource = shader.getFragmentResource();
         this.device = device;
     }
 

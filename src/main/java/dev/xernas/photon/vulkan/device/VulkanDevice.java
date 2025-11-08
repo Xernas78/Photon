@@ -1,8 +1,9 @@
-package dev.xernas.photon.vulkan;
+package dev.xernas.photon.vulkan.device;
 
 import dev.xernas.photon.api.PhotonLogic;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.exceptions.VulkanException;
+import dev.xernas.photon.vulkan.VulkanErrorHelper;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.*;
@@ -29,7 +30,7 @@ public class VulkanDevice implements PhotonLogic {
             FloatBuffer priority = stack.floats(1.0f);
 
             VkDeviceQueueCreateInfo.Buffer queueCreateInfos;
-            if (queueFamilyIndices.getGraphicsFamily().get() == queueFamilyIndices.getPresentFamily().get()) {
+            if (queueFamilyIndices.getGraphicsFamily().get().equals(queueFamilyIndices.getPresentFamily().get())) {
                 queueCreateInfos = VkDeviceQueueCreateInfo.calloc(1, stack);
                 queueCreateInfos.get(0)
                         .sType(VK10.VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO)
@@ -59,7 +60,7 @@ public class VulkanDevice implements PhotonLogic {
 
             PointerBuffer pDevice = stack.mallocPointer(1);
             int err = VK10.vkCreateDevice(physicalDevice.getPhysicalDevice(), createInfo, null, pDevice);
-            if (err != VK10.VK_SUCCESS) throw new VulkanException("Failed to create logical device: " + err);
+            if (err != VK10.VK_SUCCESS) throw new VulkanException("Failed to create logical device: " + VulkanErrorHelper.vkResultToString(err));
 
             device = new VkDevice(pDevice.get(0), physicalDevice.getPhysicalDevice(), createInfo);
 
@@ -74,9 +75,19 @@ public class VulkanDevice implements PhotonLogic {
         }
     }
 
+    public void waitIdle() throws VulkanException {
+        int err = VK10.vkDeviceWaitIdle(device);
+        if (err != VK10.VK_SUCCESS) throw new VulkanException("Failed to wait for device idle: " + VulkanErrorHelper.vkResultToString(err));
+    }
+
     @Override
     public void dispose() throws PhotonException {
+        waitIdle();
         VK10.vkDestroyDevice(device, null);
+    }
+
+    public VulkanPhysicalDevice getPhysicalDevice() {
+        return physicalDevice;
     }
 
     public VkDevice getDevice() {

@@ -1,4 +1,9 @@
 package dev.xernas.photon.api;
 
-public interface Renderer {
+import dev.xernas.photon.exceptions.PhotonException;
+
+public interface Renderer extends PhotonLogic {
+
+    void swapBuffers() throws PhotonException;
+
 }

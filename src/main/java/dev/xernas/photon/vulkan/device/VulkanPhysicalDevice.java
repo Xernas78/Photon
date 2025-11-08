@@ -1,8 +1,11 @@
-package dev.xernas.photon.vulkan;
+package dev.xernas.photon.vulkan.device;
 
 import dev.xernas.photon.api.PhotonLogic;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.exceptions.VulkanException;
+import dev.xernas.photon.vulkan.VulkanInstance;
+import dev.xernas.photon.vulkan.VulkanSurface;
+import dev.xernas.photon.vulkan.swapchain.VulkanSwapChain;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.*;
