@@ -2,12 +2,13 @@ package dev.xernas.photon.api.window;
 
 import dev.xernas.photon.PhotonAPI;
 import dev.xernas.photon.api.PhotonLogic;
-import dev.xernas.photon.api.Renderer;
+import dev.xernas.photon.api.IRenderer;
 import dev.xernas.photon.exceptions.PhotonException;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
@@ -73,9 +74,9 @@ public class Window implements PhotonLogic {
 
         // Callbacks
         GLFW.glfwSetFramebufferSizeCallback(handle, (window, w, h) -> {
+            if (w == 0 || h == 0) return;
             setFramebufferResized(true);
-            this.width = w;
-            this.height = h;
+            resize(w, h);
         });
         //TODO: Key callback
 
@@ -95,7 +96,7 @@ public class Window implements PhotonLogic {
         }
     }
 
-    public void update(Renderer renderer) throws PhotonException {
+    public void update(IRenderer renderer) throws PhotonException {
         renderer.swapBuffers();
         GLFW.glfwPollEvents();
     }
@@ -117,6 +118,7 @@ public class Window implements PhotonLogic {
         this.width = width;
         this.height = height;
         GLFW.glfwSetWindowSize(handle, width, height);
+        GL11.glViewport(0, 0, width, height);
     }
 
     public long getHandle() {

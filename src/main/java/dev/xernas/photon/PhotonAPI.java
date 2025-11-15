@@ -1,7 +1,8 @@
 package dev.xernas.photon;
 
-import dev.xernas.photon.api.Renderer;
-import dev.xernas.photon.api.Shader;
+import dev.xernas.photon.api.IMesh;
+import dev.xernas.photon.api.IRenderer;
+import dev.xernas.photon.api.IShader;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.api.window.Window;
 
@@ -49,9 +50,9 @@ public class PhotonAPI {
         return debug;
     }
 
-    public static Renderer createRenderer(Shader shader, Window window) throws PhotonException {
+    public static IRenderer<IShader, IMesh> getRenderer(Window window) throws PhotonException {
         if (!initialized) throw new IllegalStateException("PhotonAPI is not initialized. Call PhotonAPI.init() first.");
-        return library.createRenderer(shader, window, window.isVsync(), debug);
+        return (IRenderer<IShader, IMesh>) library.createRenderer(window, window.isVsync(), debug);
     }
 
     public static boolean isInitialized() {

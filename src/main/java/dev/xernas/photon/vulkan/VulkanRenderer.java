@@ -1,10 +1,8 @@
 package dev.xernas.photon.vulkan;
 
 import dev.xernas.photon.PhotonAPI;
-import dev.xernas.photon.api.Renderer;
-import dev.xernas.photon.api.Shader;
+import dev.xernas.photon.api.*;
 import dev.xernas.photon.exceptions.PhotonException;
-import dev.xernas.photon.exceptions.VulkanException;
 import dev.xernas.photon.vulkan.device.VulkanDevice;
 import dev.xernas.photon.vulkan.device.VulkanPhysicalDevice;
 import dev.xernas.photon.vulkan.pipeline.VulkanPipeline;
@@ -15,9 +13,7 @@ import dev.xernas.photon.vulkan.swapchain.VulkanSwapChain;
 import dev.xernas.photon.api.window.Window;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Map;
-
-public class VulkanRenderer implements Renderer {
+public class VulkanRenderer implements IRenderer<VulkanShader, IMesh> {
 
     private final Window window;
 
@@ -32,7 +28,7 @@ public class VulkanRenderer implements Renderer {
     private final VulkanCommandPool commandPool;
     private final VulkanSynchronisation synchronisation;
 
-    public VulkanRenderer(Shader shader, Window window, boolean vsync, boolean enableValidation) {
+    public VulkanRenderer(Window window, boolean vsync, boolean enableValidation) {
         this.window = window;
         this.instance = new VulkanInstance(enableValidation);
         this.surface = new VulkanSurface(window, instance);
@@ -40,10 +36,15 @@ public class VulkanRenderer implements Renderer {
         this.device = new VulkanDevice(physicalDevice);
         this.swapChain = new VulkanSwapChain(vsync, window, device, physicalDevice, surface);
         this.renderPass = new VulkanRenderPass(swapChain, device);
-        this.pipeline = new VulkanPipeline(new VulkanShader(shader, device), renderPass, swapChain, device);
+        this.pipeline = new VulkanPipeline(new VulkanShader(null, device), renderPass, swapChain, device);
         this.framebuffers = new VulkanFramebuffers(swapChain, renderPass, device);
         this.commandPool = new VulkanCommandPool(framebuffers, swapChain, device);
         this.synchronisation = new VulkanSynchronisation(device);
+    }
+
+    @Override
+    public void render(VulkanShader shader, IMesh mesh) throws PhotonException {
+
     }
 
     @Override
@@ -63,6 +64,16 @@ public class VulkanRenderer implements Renderer {
         swapChain.submitCommandBuffer(imageIndex, synchronisation, commandBuffer);
         int err = swapChain.presentImage(imageIndex, synchronisation, this);
         if (err == -1) recreateSwapChain();
+    }
+
+    @Override
+    public IMesh loadMesh(Mesh mesh) throws PhotonException {
+        return null;
+    }
+
+    @Override
+    public VulkanShader loadShader(Shader shader) throws PhotonException {
+        return null;
     }
 
     public void recreateSwapChain() throws PhotonException {

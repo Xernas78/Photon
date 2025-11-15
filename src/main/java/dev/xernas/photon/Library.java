@@ -1,10 +1,10 @@
 package dev.xernas.photon;
 
-import dev.xernas.photon.api.Renderer;
-import dev.xernas.photon.api.Shader;
+import dev.xernas.photon.api.IMesh;
+import dev.xernas.photon.api.IRenderer;
+import dev.xernas.photon.api.IShader;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.opengl.OpenGLRenderer;
-import dev.xernas.photon.vulkan.VulkanRenderer;
 import dev.xernas.photon.api.window.Window;
 
 import java.util.Locale;
@@ -37,9 +37,10 @@ public enum Library {
         return name().toLowerCase(Locale.ROOT).startsWith("opengl");
     }
 
-    public Renderer createRenderer(Shader shader, Window window, boolean vsync, boolean debug) throws PhotonException {
+    public IRenderer<? extends IShader, ? extends IMesh> createRenderer(Window window, boolean vsync, boolean debug) throws PhotonException {
         if (isVulkan()) {
-            return new VulkanRenderer(shader, window, vsync, debug);
+            throw new PhotonException("Vulkan is in development and not yet supported.");
+            // return new VulkanRenderer(window, vsync, debug);
         } else if (isOpenGL()) {
             return new OpenGLRenderer(window, vsync, debug);
         }
