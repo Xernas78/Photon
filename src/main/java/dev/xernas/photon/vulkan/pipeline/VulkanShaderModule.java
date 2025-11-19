@@ -1,11 +1,9 @@
 package dev.xernas.photon.vulkan.pipeline;
 
-import dev.xernas.photon.api.PhotonLogic;
-import dev.xernas.photon.api.ShaderModule;
+import dev.xernas.photon.api.shader.ShaderModule;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.exceptions.VulkanException;
 import dev.xernas.photon.utils.ShaderCompiler;
-import dev.xernas.photon.utils.ShaderType;
 import dev.xernas.photon.vulkan.device.VulkanDevice;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;

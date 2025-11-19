@@ -1,9 +1,12 @@
 package dev.xernas.photon;
 
-import dev.xernas.photon.api.IMesh;
+import dev.xernas.photon.api.model.IMesh;
 import dev.xernas.photon.api.IRenderer;
-import dev.xernas.photon.api.IShader;
+import dev.xernas.photon.api.shader.IShader;
+import dev.xernas.photon.api.texture.ITexture;
+import dev.xernas.photon.api.texture.Texture;
 import dev.xernas.photon.exceptions.PhotonException;
+import dev.xernas.photon.opengl.GLTexture;
 import dev.xernas.photon.opengl.OpenGLRenderer;
 import dev.xernas.photon.api.window.Window;
 
@@ -16,7 +19,7 @@ public enum Library {
     VULKAN_1_2("1.2"),
     VULKAN_1_3("1.3"),
     VULKAN_1_4("1.4"),
-    OPENGL_3_3("3.3"),
+    OPENGL_4_5("4.5"),
     OPENGL_4_6("4.6");
 
     private final String version;
@@ -29,12 +32,39 @@ public enum Library {
         return version;
     }
 
+    public boolean higher(Library other) {
+        if (!isSameAPI(other)) throw new IllegalArgumentException("Cannot compare versions of different APIs");
+        int thisVersion = Integer.parseInt(this.version.replace(".", ""));
+        int otherVersion = Integer.parseInt(other.version.replace(".", ""));
+        return thisVersion > otherVersion;
+    }
+
+    public boolean higherOrEquals(Library other) {
+        if (!isSameAPI(other)) throw new IllegalArgumentException("Cannot compare versions of different APIs");
+        int thisVersion = Integer.parseInt(this.version.replace(".", ""));
+        int otherVersion = Integer.parseInt(other.version.replace(".", ""));
+        return thisVersion >= otherVersion;
+    }
+
+    public boolean isSameAPI(Library other) {
+        return (this.isVulkan() && other.isVulkan()) || (this.isOpenGL() && other.isOpenGL());
+    }
+
     public boolean isVulkan() {
         return name().toLowerCase(Locale.ROOT).startsWith("vulkan");
     }
 
     public boolean isOpenGL() {
         return name().toLowerCase(Locale.ROOT).startsWith("opengl");
+    }
+
+    public ITexture createTexture(Texture texture) {
+        if (isVulkan()) {
+            // return new VulkanTexture(texture);
+        } else if (isOpenGL()) {
+            return new GLTexture(texture);
+        }
+        return null;
     }
 
     public IRenderer<? extends IShader, ? extends IMesh> createRenderer(Window window, boolean vsync, boolean debug) throws PhotonException {

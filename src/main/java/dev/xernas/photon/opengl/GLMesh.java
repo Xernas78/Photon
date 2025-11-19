@@ -1,49 +1,68 @@
 package dev.xernas.photon.opengl;
 
-import dev.xernas.photon.api.IMesh;
-import dev.xernas.photon.api.Mesh;
+import dev.xernas.photon.PhotonAPI;
+import dev.xernas.photon.api.model.IMesh;
+import dev.xernas.photon.api.model.Model;
 import dev.xernas.photon.api.PhotonLogic;
 import dev.xernas.photon.exceptions.PhotonException;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL45;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class GLMesh implements IMesh {
 
-    private final Mesh mesh;
+    private final Model model;
 
     private VAO vao;
 
-    public GLMesh(Mesh mesh) {
-        this.mesh = mesh;
+    public GLMesh(Model model) {
+        this.model = model;
     }
 
     @Override
     public int getVertexCount() {
-        return mesh.getVertices().length / 3;
+        return model.getIndices().length;
     }
 
     @Override
     public void start() throws PhotonException {
-        VBO verticesVBO = new VBO();
-        vao = new VAO(verticesVBO);
+        // Checks
+        if (model.getVertices() == null || model.getIndices() == null || model.getMaterial() == null) throw new PhotonException("Model vertices or indices are null");
+
+        // Create buffers
+        GLBufferObject verticesBuffer = new GLBufferObject(GLBufferObject.GLBufferType.VERTEX, GLBufferObject.GLDataType.VERTICES);
+        GLBufferObject indicesBuffer = new GLBufferObject(GLBufferObject.GLBufferType.ELEMENT);
+        GLBufferObject texCoordsBuffer = null;
+        if (hasTexture()) texCoordsBuffer = new GLBufferObject(GLBufferObject.GLBufferType.VERTEX, GLBufferObject.GLDataType.UVS);
+        vao = new VAO(verticesBuffer, indicesBuffer, texCoordsBuffer);
         vao.start();
 
-        verticesVBO.storeFloats(mesh.getVertices());
-        vao.storeVBOInAttribute(0, 0);
+        // Store data in buffers
+        verticesBuffer.storeBuffer(model.getVertices());
+        indicesBuffer.storeBuffer(model.getIndices());
+        if (hasTexture() && texCoordsBuffer != null) texCoordsBuffer.storeBuffer(model.getTexCoords());
+
+        // Create attributes
+        vao.createBufferAttribute(verticesBuffer, 0);
+        if (hasTexture() && texCoordsBuffer != null) vao.createBufferAttribute(texCoordsBuffer, 1);
+    }
+
+    public boolean hasTexture() {
+        return model.getTexCoords() != null && model.getTexCoords().length != 0 && model.getMaterial().hasTexture();
     }
 
     public void bind() {
-        GL30.glBindVertexArray(vao.getId());
-        GL30.glEnableVertexAttribArray(0);
+        GL45.glBindVertexArray(vao.getId());
+        if (hasTexture())((GLTexture) model.getMaterial().getApiTexture()).bind(0);
+        GL45.glEnableVertexAttribArray(0);
     }
 
     public void unbind() {
-        GL30.glDisableVertexAttribArray(0);
-        GL30.glBindVertexArray(0);
+        GL45.glDisableVertexAttribArray(0);
+        if (hasTexture()) ((GLTexture) model.getMaterial().getApiTexture()).unbind(0);
+        GL45.glBindVertexArray(0);
     }
 
     @Override
@@ -54,36 +73,34 @@ public class GLMesh implements IMesh {
     public static class VAO implements PhotonLogic {
 
         private int id;
-        private final List<VBO> vbos = new ArrayList<>();
+        private final List<GLBufferObject> buffers = new ArrayList<>();
 
-        public VAO(VBO... vbos) {
-            this.vbos.addAll(Arrays.asList(vbos));
+        public VAO(GLBufferObject... buffers) {
+            for (GLBufferObject buffer : buffers) {
+                if (buffer == null) continue;
+                this.buffers.add(buffer);
+            }
         }
 
         @Override
         public void start() throws PhotonException {
-            id = GL30.glGenVertexArrays();
-            GL30.glBindVertexArray(id);
-            for (VBO vbo : vbos) vbo.start();
-            GL30.glBindVertexArray(0);
+            id = GL45.glCreateVertexArrays();
+            for (GLBufferObject gLBufferObject : buffers) {
+                gLBufferObject.start();
+                gLBufferObject.attach(this);
+            }
         }
 
-        public void storeVBOInAttribute(int vboIndex, int attribute) throws PhotonException {
-            VBO vbo = vbos.get(vboIndex);
-            if (vbo == null) throw new PhotonException("Invalid VBO Index");
-            GL30.glBindVertexArray(id);
-            GL30.glEnableVertexAttribArray(attribute);
-            GL20.glBindBuffer(GL20.GL_ARRAY_BUFFER, vbo.getId());
-            GL30.glVertexAttribPointer(attribute, 3, GL20.GL_FLOAT, false, 0, 0);
-            GL30.glDisableVertexAttribArray(attribute);
-            GL20.glBindBuffer(GL20.GL_ARRAY_BUFFER, 0);
-            GL30.glBindVertexArray(0);
+        public void createBufferAttribute(GLBufferObject buffer, int attribute) throws PhotonException {
+            GL45.glEnableVertexArrayAttrib(id, attribute);
+            GL45.glVertexArrayAttribFormat(id, attribute, buffer.dataType.getSize(), buffer.dataType.getGlConstant(), false, 0);
+            GL45.glVertexArrayAttribBinding(id, attribute, buffer.dataType.getBindingIndex());
         }
 
         @Override
         public void dispose() throws PhotonException {
-            for (VBO vbo : vbos) vbo.dispose();
-            GL30.glDeleteVertexArrays(id);
+            for (GLBufferObject gLBufferObject : buffers) gLBufferObject.dispose();
+            GL45.glDeleteVertexArrays(id);
         }
 
         public int getId() {
@@ -91,29 +108,95 @@ public class GLMesh implements IMesh {
         }
     }
 
-    public static class VBO implements PhotonLogic {
+    public static class GLBufferObject implements PhotonLogic {
 
+        private final GLBufferType type;
+        private GLDataType dataType;
         private int id;
+
+        public GLBufferObject(GLBufferType type) {
+            this.type = type;
+        }
+
+        public GLBufferObject(GLBufferType type, GLDataType dataType) {
+            this.type = type;
+            this.dataType = dataType;
+        }
 
         @Override
         public void start() throws PhotonException {
-            id = GL20.glGenBuffers();
+            id = GL45.glCreateBuffers();
         }
 
-        public void storeFloats(float[] floats) {
-            GL20.glBindBuffer(GL20.GL_ARRAY_BUFFER, id);
-            GL20.glBufferData(GL20.GL_ARRAY_BUFFER, floats, GL20.GL_STATIC_DRAW);
-            GL20.glBindBuffer(GL20.GL_ARRAY_BUFFER, 0);
+        public void attach(VAO vao) throws PhotonException {
+            switch (type) {
+                case VERTEX -> {
+                    if (dataType == null) throw new PhotonException("Data type must be specified for vertex buffer");
+                    GL45.glVertexArrayVertexBuffer(vao.getId(), dataType.getBindingIndex(), id, 0, dataType.getStride());
+                }
+                case ELEMENT -> GL45.glVertexArrayElementBuffer(vao.getId(), id);
+            }
+        }
+
+        public void storeBuffer(float[] floats) {
+            GL45.glNamedBufferData(id, floats, GL20.GL_STATIC_DRAW);
+        }
+
+        public void storeBuffer(int[] ints) {
+            GL45.glNamedBufferData(id, ints, GL20.GL_STATIC_DRAW);
         }
 
         @Override
         public void dispose() throws PhotonException {
-            GL20.glDeleteBuffers(id);
+            GL45.glDeleteBuffers(id);
         }
 
         public int getId() {
             return id;
         }
+
+        public enum GLDataType {
+
+            VERTICES(0, 3, GL20.GL_FLOAT, Float.BYTES * 3),
+            UVS(1, 2, GL20.GL_FLOAT, Float.BYTES * 2),
+            NORMALS(2, 3, GL20.GL_FLOAT, Float.BYTES * 3);
+
+            private final int bindingIndex;
+            private final int size;
+            private final int glConstant;
+            private final int stride;
+
+            GLDataType(int bindingIndex, int size, int glConstant, int stride) {
+                this.bindingIndex = bindingIndex;
+                this.size = size;
+                this.glConstant = glConstant;
+                this.stride = stride;
+            }
+
+            public int getBindingIndex() {
+                return bindingIndex;
+            }
+
+            public int getSize() {
+                return size;
+            }
+
+            public int getGlConstant() {
+                return glConstant;
+            }
+
+            public int getStride() {
+                return stride;
+            }
+        }
+
+        public enum GLBufferType {
+
+            VERTEX,
+            ELEMENT
+
+        }
+
     }
 
 }

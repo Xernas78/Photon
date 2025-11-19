@@ -1,20 +1,16 @@
 package dev.xernas.photon.opengl;
 
-import dev.xernas.photon.api.IShader;
-import dev.xernas.photon.api.Shader;
-import dev.xernas.photon.api.ShaderModule;
+import dev.xernas.photon.api.shader.IShader;
+import dev.xernas.photon.api.shader.Shader;
+import dev.xernas.photon.api.shader.ShaderModule;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.utils.GlobalUtilitaries;
 import dev.xernas.photon.utils.ShaderResource;
 import dev.xernas.photon.utils.ShaderType;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 public class GLShader implements IShader {
-
-    private final ShaderResource vertexShaderResource;
-    private final ShaderResource fragmentShaderResource;
 
     private GLShaderModule vertexShader;
     private GLShaderModule fragmentShader;
@@ -22,8 +18,8 @@ public class GLShader implements IShader {
     private int programId;
 
     public GLShader(Shader shader) {
-        this.vertexShaderResource = shader.getVertexResource();
-        this.fragmentShaderResource = shader.getFragmentResource();
+        this.vertexShader = new GLShaderModule(shader.getVertexResource(), ShaderType.VERTEX);
+        this.fragmentShader = new GLShaderModule(shader.getFragmentResource(), ShaderType.FRAGMENT);
     }
 
     @Override
@@ -38,8 +34,6 @@ public class GLShader implements IShader {
 
     @Override
     public void start() throws PhotonException {
-        vertexShader = new GLShaderModule(vertexShaderResource, ShaderType.VERTEX);
-        fragmentShader = new GLShaderModule(fragmentShaderResource, ShaderType.FRAGMENT);
         vertexShader.start();
         fragmentShader.start();
 
@@ -48,7 +42,7 @@ public class GLShader implements IShader {
         GL30.glAttachShader(programId, vertexShader.getShaderId());
         GL30.glAttachShader(programId, fragmentShader.getShaderId());
         GL30.glLinkProgram(programId);
-        if (GL30.glGetProgrami(programId, GL30.GL_LINK_STATUS) == GL11.GL_FALSE) throw new PhotonException("Could not link shader program");
+        if (GL30.glGetProgrami(programId, GL30.GL_LINK_STATUS) == GL20.GL_FALSE) throw new PhotonException("Could not link shader program");
 
         if (vertexShader.getShaderId() != 0) {
             GL30.glDetachShader(programId, vertexShader.getShaderId());
@@ -60,7 +54,7 @@ public class GLShader implements IShader {
         }
 
         GL30.glValidateProgram(programId);
-        if (GL30.glGetProgrami(programId, GL30.GL_VALIDATE_STATUS) == GL11.GL_FALSE) throw new PhotonException("Could not validate shader program");
+        if (GL30.glGetProgrami(programId, GL30.GL_VALIDATE_STATUS) == GL20.GL_FALSE) throw new PhotonException("Could not validate shader program");
     }
 
     public void bind() {
@@ -69,6 +63,13 @@ public class GLShader implements IShader {
 
     public void unbind() {
         GL30.glUseProgram(0);
+    }
+
+    public void changeShader(Shader shader) throws PhotonException {
+        dispose();
+        this.vertexShader = new GLShaderModule(shader.getVertexResource(), ShaderType.VERTEX);
+        this.fragmentShader = new GLShaderModule(shader.getFragmentResource(), ShaderType.FRAGMENT);
+        start();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package dev.xernas.photon.utils;
 
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL43;
+import org.lwjgl.opengl.GL45;
 import org.lwjgl.util.shaderc.Shaderc;
 import org.lwjgl.vulkan.VK10;
 
@@ -31,7 +31,7 @@ public enum ShaderType {
         return switch (this) {
             case VERTEX -> GL20.GL_VERTEX_SHADER;
             case FRAGMENT -> GL20.GL_FRAGMENT_SHADER;
-            case COMPUTE -> GL43.GL_COMPUTE_SHADER;
+            case COMPUTE -> GL45.GL_COMPUTE_SHADER;
         };
     }
 

@@ -1,8 +1,8 @@
 package dev.xernas.photon.vulkan.pipeline;
 
-import dev.xernas.photon.api.IShader;
-import dev.xernas.photon.api.Shader;
-import dev.xernas.photon.api.ShaderModule;
+import dev.xernas.photon.api.shader.IShader;
+import dev.xernas.photon.api.shader.Shader;
+import dev.xernas.photon.api.shader.ShaderModule;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.utils.ShaderCompiler;
 import dev.xernas.photon.utils.ShaderResource;

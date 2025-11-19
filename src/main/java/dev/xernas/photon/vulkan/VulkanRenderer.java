@@ -2,6 +2,9 @@ package dev.xernas.photon.vulkan;
 
 import dev.xernas.photon.PhotonAPI;
 import dev.xernas.photon.api.*;
+import dev.xernas.photon.api.model.IMesh;
+import dev.xernas.photon.api.model.Model;
+import dev.xernas.photon.api.shader.Shader;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.vulkan.device.VulkanDevice;
 import dev.xernas.photon.vulkan.device.VulkanPhysicalDevice;
@@ -67,7 +70,7 @@ public class VulkanRenderer implements IRenderer<VulkanShader, IMesh> {
     }
 
     @Override
-    public IMesh loadMesh(Mesh mesh) throws PhotonException {
+    public IMesh loadMesh(Model model) throws PhotonException {
         return null;
     }
 

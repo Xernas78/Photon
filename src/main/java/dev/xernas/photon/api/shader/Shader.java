@@ -1,4 +1,4 @@
-package dev.xernas.photon.api;
+package dev.xernas.photon.api.shader;
 
 import dev.xernas.photon.utils.ShaderResource;
 

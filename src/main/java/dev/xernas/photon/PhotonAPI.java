@@ -1,8 +1,10 @@
 package dev.xernas.photon;
 
-import dev.xernas.photon.api.IMesh;
+import dev.xernas.photon.api.model.IMesh;
 import dev.xernas.photon.api.IRenderer;
-import dev.xernas.photon.api.IShader;
+import dev.xernas.photon.api.shader.IShader;
+import dev.xernas.photon.api.texture.ITexture;
+import dev.xernas.photon.api.texture.Texture;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.api.window.Window;
 
@@ -48,6 +50,11 @@ public class PhotonAPI {
 
     public static boolean isDebug() {
         return debug;
+    }
+
+    public static ITexture getTexture(Texture texture) {
+        if (!initialized) throw new IllegalStateException("PhotonAPI is not initialized. Call PhotonAPI.init() first.");
+        return library.createTexture(texture);
     }
 
     public static IRenderer<IShader, IMesh> getRenderer(Window window) throws PhotonException {

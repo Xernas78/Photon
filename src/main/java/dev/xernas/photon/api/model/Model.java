@@ -1,17 +1,21 @@
-package dev.xernas.photon.api;
+package dev.xernas.photon.api.model;
 
-public class Mesh {
+import dev.xernas.photon.api.material.Material;
+
+public class Model {
 
     private final float[] vertices;
     private final int[] indices;
     private final float[] texCoords;
     private final float[] normals;
+    private final Material material;
 
-    public Mesh(float[] vertices, int[] indices, float[] texCoords, float[] normals) {
+    public Model(float[] vertices, int[] indices, float[] texCoords, float[] normals, Material material) {
         this.vertices = vertices;
         this.indices = indices;
         this.texCoords = texCoords;
         this.normals = normals;
+        this.material = material;
     }
 
     public float[] getVertices() {
@@ -28,5 +32,9 @@ public class Mesh {
 
     public float[] getNormals() {
         return normals;
+    }
+
+    public Material getMaterial() {
+        return material;
     }
 }

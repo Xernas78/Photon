@@ -2,13 +2,12 @@ package dev.xernas.photon.opengl;
 
 import dev.xernas.photon.PhotonAPI;
 import dev.xernas.photon.api.IRenderer;
-import dev.xernas.photon.api.Mesh;
-import dev.xernas.photon.api.Shader;
+import dev.xernas.photon.api.model.Model;
+import dev.xernas.photon.api.shader.Shader;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.api.window.Window;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLUtil;
 
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ public class OpenGLRenderer implements IRenderer<GLShader, GLMesh> {
     public void render(GLShader shader, GLMesh mesh) {
         shader.bind();
         mesh.bind();
-        GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, mesh.getVertexCount());
+        GLUtils.draw(0, mesh.getVertexCount());
         mesh.unbind();
         shader.unbind();
     }
@@ -41,8 +40,7 @@ public class OpenGLRenderer implements IRenderer<GLShader, GLMesh> {
     @Override
     public void swapBuffers() {
         GLFW.glfwSwapBuffers(window.getHandle());
-
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        GLUtils.clear();
     }
 
     @Override
@@ -51,9 +49,9 @@ public class OpenGLRenderer implements IRenderer<GLShader, GLMesh> {
         GLFW.glfwMakeContextCurrent(window.getHandle());
         GLFW.glfwSwapInterval(vsync ? 1 : 0);
         GL.createCapabilities();
-        GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
+        GLUtils.viewport(window);
         if (debug) {
-            System.out.println("OpenGL Starting with Renderer: " + GL11.glGetString(GL11.GL_RENDERER));
+            System.out.println("OpenGL Starting with Renderer: " + GLUtils.getRendererInfo());
             GLUtil.setupDebugMessageCallback(System.err);
         }
     }
@@ -67,8 +65,8 @@ public class OpenGLRenderer implements IRenderer<GLShader, GLMesh> {
     }
 
     @Override
-    public GLMesh loadMesh(Mesh mesh) throws PhotonException {
-        GLMesh glMesh = new GLMesh(mesh);
+    public GLMesh loadMesh(Model model) throws PhotonException {
+        GLMesh glMesh = new GLMesh(model);
         glMesh.start();
         loadedMeshes.add(glMesh);
         return glMesh;
