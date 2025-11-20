@@ -9,6 +9,10 @@ public class TextureMaterial implements Material {
 
     private Texture texture;
 
+    public TextureMaterial(Texture texture) {
+        this.texture = texture;
+    }
+
     @Override
     public Texture getTexture() {
         return texture;
