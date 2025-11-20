@@ -31,11 +31,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>dev.xernas</groupId>
-            <artifactId>Atom</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl-shaderc</artifactId>
             <version>${lwjgl.version}</version>
