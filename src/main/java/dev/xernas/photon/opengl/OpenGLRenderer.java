@@ -29,12 +29,11 @@ public class OpenGLRenderer implements IRenderer<GLShader, GLMesh> {
     }
 
     @Override
-    public void render(GLShader shader, GLMesh mesh) {
+    public void render(GLShader shader, GLMesh mesh) throws PhotonException {
         shader.bind();
         mesh.bind();
+        shader.useSampler("textureSampler", 0);
         GLUtils.draw(0, mesh.getVertexCount());
-        mesh.unbind();
-        shader.unbind();
     }
 
     @Override

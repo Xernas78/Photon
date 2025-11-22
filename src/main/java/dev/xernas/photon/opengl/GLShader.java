@@ -5,12 +5,20 @@ import dev.xernas.photon.api.shader.Shader;
 import dev.xernas.photon.api.shader.ShaderModule;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.utils.GlobalUtilitaries;
-import dev.xernas.photon.utils.ShaderResource;
 import dev.xernas.photon.utils.ShaderType;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL45;
+import org.lwjgl.system.MemoryStack;
+
+import java.nio.IntBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GLShader implements IShader {
+
+    private static int lastBoundProgramId = 0;
+
+    private final Map<String, Integer> uniforms = new HashMap<>();
 
     private GLShaderModule vertexShader;
     private GLShaderModule fragmentShader;
@@ -33,36 +41,40 @@ public class GLShader implements IShader {
     }
 
     @Override
+    public <T> boolean setUniform(String name, T value) throws PhotonException {
+        int location = uniforms.getOrDefault(name, -1);
+        if (location == -1) return false;
+        GLUniform<T> uniform = new GLUniform<>(name, location);
+        if (value == null) {
+            throw new PhotonException("Trying to set uniform with null value: " + name);
+        }
+        uniform.set(value);
+        return true;
+    }
+
+    @Override
+    public boolean useSampler(String name, int unit) throws PhotonException {
+        return setUniform(name, unit);
+    }
+
+    @Override
     public void start() throws PhotonException {
         vertexShader.start();
         fragmentShader.start();
 
-        programId = GlobalUtilitaries.requireNotEquals(GL30.glCreateProgram(), 0, "Error creating shader program");
-        if (programId == 0) throw new PhotonException("Could not create program");
-        GL30.glAttachShader(programId, vertexShader.getShaderId());
-        GL30.glAttachShader(programId, fragmentShader.getShaderId());
-        GL30.glLinkProgram(programId);
-        if (GL30.glGetProgrami(programId, GL30.GL_LINK_STATUS) == GL20.GL_FALSE) throw new PhotonException("Could not link shader program");
-
-        if (vertexShader.getShaderId() != 0) {
-            GL30.glDetachShader(programId, vertexShader.getShaderId());
-            vertexShader.dispose();
-        }
-        if (fragmentShader.getShaderId() != 0) {
-            GL30.glDetachShader(programId, fragmentShader.getShaderId());
-            fragmentShader.dispose();
-        }
-
-        GL30.glValidateProgram(programId);
-        if (GL30.glGetProgrami(programId, GL30.GL_VALIDATE_STATUS) == GL20.GL_FALSE) throw new PhotonException("Could not validate shader program");
+        programId = getProgram();
+        uniforms.putAll(getUniformLocations());
     }
 
     public void bind() {
-        GL30.glUseProgram(programId);
+        if (lastBoundProgramId == programId) return;
+        GL45.glUseProgram(programId);
+        lastBoundProgramId = programId;
     }
 
     public void unbind() {
-        GL30.glUseProgram(0);
+        GL45.glUseProgram(0);
+        lastBoundProgramId = 0;
     }
 
     public void changeShader(Shader shader) throws PhotonException {
@@ -72,9 +84,57 @@ public class GLShader implements IShader {
         start();
     }
 
+    private int getProgram() throws PhotonException {
+        int program = GlobalUtilitaries.requireNotEquals(GL45.glCreateProgram(), 0, "Error creating shader program");
+        if (program == 0) throw new PhotonException("Could not create program");
+        GL45.glAttachShader(program, vertexShader.getShaderId());
+        GL45.glAttachShader(program, fragmentShader.getShaderId());
+        GL45.glLinkProgram(program);
+        if (GL45.glGetProgrami(program, GL45.GL_LINK_STATUS) == GL20.GL_FALSE) throw new PhotonException("Could not link shader program");
+
+        if (vertexShader.getShaderId() != 0) {
+            GL45.glDetachShader(program, vertexShader.getShaderId());
+            vertexShader.dispose();
+        }
+        if (fragmentShader.getShaderId() != 0) {
+            GL45.glDetachShader(program, fragmentShader.getShaderId());
+            fragmentShader.dispose();
+        }
+
+        GL45.glValidateProgram(program);
+        if (GL45.glGetProgrami(program, GL45.GL_VALIDATE_STATUS) == GL20.GL_FALSE) throw new PhotonException("Could not validate shader program");
+        return program;
+    }
+
+    private Map<String, Integer> getUniformLocations() {
+        Map<String, Integer> uniformLocations = new HashMap<>();
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer count = stack.mallocInt(1);
+            GL45.glGetProgramiv(programId, GL20.GL_ACTIVE_UNIFORMS, count);
+            for (int i = 0; i < count.get(0); i++) {
+
+                IntBuffer size = stack.mallocInt(1);
+                IntBuffer type = stack.mallocInt(1);
+                String name = GL45.glGetActiveUniform(programId, i, size, type).trim();
+                if (name.endsWith("[0]")) name = name.substring(0, name.length() - 3);
+                if (size.get(0) > 1) {
+                    for (int j = 0; j < size.get(0); j++) {
+                        String arrayName = name + "[" + j + "]";
+                        int location = GL45.glGetUniformLocation(programId, arrayName);
+                        uniformLocations.put(arrayName, location);
+                    }
+                } else {
+                    int location = GL45.glGetUniformLocation(programId, name);
+                    uniformLocations.put(name, location);
+                }
+            }
+        }
+        return uniformLocations;
+    }
+
     @Override
     public void dispose() throws PhotonException {
-        GL30.glDeleteProgram(programId);
+        GL45.glDeleteProgram(programId);
     }
 
     public int getProgramId() {

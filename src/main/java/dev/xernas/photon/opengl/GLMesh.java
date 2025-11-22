@@ -1,6 +1,5 @@
 package dev.xernas.photon.opengl;
 
-import dev.xernas.photon.PhotonAPI;
 import dev.xernas.photon.api.model.IMesh;
 import dev.xernas.photon.api.model.Model;
 import dev.xernas.photon.api.PhotonLogic;
@@ -13,9 +12,12 @@ import java.util.List;
 
 public class GLMesh implements IMesh {
 
+    private static int lastBoundMeshId = 0;
+
     private final Model model;
 
     private VAO vao;
+    private GLTexture texture;
 
     public GLMesh(Model model) {
         this.model = model;
@@ -36,13 +38,26 @@ public class GLMesh implements IMesh {
         GLBufferObject indicesBuffer = new GLBufferObject(GLBufferObject.GLBufferType.ELEMENT);
         GLBufferObject texCoordsBuffer = null;
         if (hasTexture()) texCoordsBuffer = new GLBufferObject(GLBufferObject.GLBufferType.VERTEX, GLBufferObject.GLDataType.UVS);
+
+        if (hasTexture()) texture = (GLTexture) model.getMaterial().getApiTexture();
+        if (hasTexture()) texture.start();
+
         vao = new VAO(verticesBuffer, indicesBuffer, texCoordsBuffer);
         vao.start();
 
         // Store data in buffers
         verticesBuffer.storeBuffer(model.getVertices());
         indicesBuffer.storeBuffer(model.getIndices());
-        if (hasTexture() && texCoordsBuffer != null) texCoordsBuffer.storeBuffer(model.getTexCoords());
+        if (hasTexture() && texCoordsBuffer != null) {
+            float[] src = model.getTexCoords();
+            // Inverse V (y) : v -> 1 - v
+            float[] flipped = new float[src.length];
+            for (int i = 0; i < src.length; i += 2) {
+                flipped[i] = src[i]; // u
+                if (i + 1 < src.length) flipped[i + 1] = 1.0f - src[i + 1]; // v
+            }
+            texCoordsBuffer.storeBuffer(flipped);
+        }
 
         // Create attributes
         vao.createBufferAttribute(verticesBuffer, 0);
@@ -54,19 +69,22 @@ public class GLMesh implements IMesh {
     }
 
     public void bind() {
-        GL45.glBindVertexArray(vao.getId());
-        if (hasTexture())((GLTexture) model.getMaterial().getApiTexture()).bind(0);
+        if (lastBoundMeshId != vao.getId()) GL45.glBindVertexArray(vao.getId());
+        lastBoundMeshId = vao.getId();
+        if (hasTexture()) texture.bind(0);
         GL45.glEnableVertexAttribArray(0);
     }
 
     public void unbind() {
         GL45.glDisableVertexAttribArray(0);
-        if (hasTexture()) ((GLTexture) model.getMaterial().getApiTexture()).unbind(0);
+        if (hasTexture()) texture.unbind(0);
         GL45.glBindVertexArray(0);
+        lastBoundMeshId = 0;
     }
 
     @Override
     public void dispose() throws PhotonException {
+        if (hasTexture()) texture.dispose();
         vao.dispose();
     }
 

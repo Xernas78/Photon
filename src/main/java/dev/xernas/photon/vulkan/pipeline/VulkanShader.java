@@ -35,6 +35,16 @@ public class VulkanShader implements IShader {
     }
 
     @Override
+    public <T> boolean setUniform(String name, T value) throws PhotonException {
+        return false;
+    }
+
+    @Override
+    public boolean useSampler(String name, int unit) throws PhotonException {
+        return false;
+    }
+
+    @Override
     public void start() throws PhotonException {
         ShaderCompiler.SPIRV vertexSPIRV = ShaderCompiler.compileShaderCodeToSPIRV(vertexResource.filename(), vertexResource.shaderCode(), ShaderType.VERTEX);
         ShaderCompiler.SPIRV fragmentSPIRV = ShaderCompiler.compileShaderCodeToSPIRV(fragmentResource.filename(), fragmentResource.shaderCode(), ShaderType.FRAGMENT);

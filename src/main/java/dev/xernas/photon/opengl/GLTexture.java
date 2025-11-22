@@ -6,12 +6,14 @@ import dev.xernas.photon.exceptions.PhotonException;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL45;
 
+import java.util.Arrays;
+
 public class GLTexture implements ITexture {
+
+    private static int lastBoundTextureId = 0;
 
     private final Texture image;
     private int textureId;
-
-    private boolean bound;
 
     public GLTexture(Texture image) {
         this.image = image;
@@ -32,15 +34,14 @@ public class GLTexture implements ITexture {
     }
 
     public void bind(int unit) {
-        if (bound) return;
+        if (lastBoundTextureId == textureId) return;
         GL45.glBindTextureUnit(unit, textureId);
-        bound = true;
+        lastBoundTextureId = textureId;
     }
 
     public void unbind(int unit) {
-        if (!bound) return;
         GL45.glBindTextureUnit(unit, 0);
-        bound = false;
+        lastBoundTextureId = 0;
     }
 
     @Override
