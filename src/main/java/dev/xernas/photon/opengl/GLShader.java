@@ -41,20 +41,12 @@ public class GLShader implements IShader {
     }
 
     @Override
-    public <T> boolean setUniform(String name, T value) throws PhotonException {
+    public <T> GLUniform<T> setUniform(String name, T value) {
         int location = uniforms.getOrDefault(name, -1);
-        if (location == -1) return false;
-        GLUniform<T> uniform = new GLUniform<>(name, location);
-        if (value == null) {
-            throw new PhotonException("Trying to set uniform with null value: " + name);
-        }
+        if (location == -1) return null;
+        GLUniform<T> uniform =  new GLUniform<>(name, location);
         uniform.set(value);
-        return true;
-    }
-
-    @Override
-    public boolean useSampler(String name, int unit) throws PhotonException {
-        return setUniform(name, unit);
+        return uniform;
     }
 
     @Override

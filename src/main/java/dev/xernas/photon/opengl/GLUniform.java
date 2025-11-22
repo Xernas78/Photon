@@ -22,6 +22,7 @@ public class GLUniform<T> implements IUniform<T> {
     @Override
     public void set(T value) {
         this.value = value;
+        if (value == null) throw new IllegalArgumentException("Trying to set uniform with null value: " + name);
         try (MemoryStack stack = MemoryStack.stackPush()) {
             if (value instanceof Integer) {
                 GL45.glUniform1i(location, (Integer) value);

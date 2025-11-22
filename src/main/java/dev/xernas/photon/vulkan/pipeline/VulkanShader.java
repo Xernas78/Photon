@@ -1,6 +1,7 @@
 package dev.xernas.photon.vulkan.pipeline;
 
 import dev.xernas.photon.api.shader.IShader;
+import dev.xernas.photon.api.shader.IUniform;
 import dev.xernas.photon.api.shader.Shader;
 import dev.xernas.photon.api.shader.ShaderModule;
 import dev.xernas.photon.exceptions.PhotonException;
@@ -35,13 +36,8 @@ public class VulkanShader implements IShader {
     }
 
     @Override
-    public <T> boolean setUniform(String name, T value) throws PhotonException {
-        return false;
-    }
-
-    @Override
-    public boolean useSampler(String name, int unit) throws PhotonException {
-        return false;
+    public <T> IUniform<T> setUniform(String name, T value) {
+        return null;
     }
 
     @Override

@@ -8,7 +8,6 @@ public interface IShader extends PhotonLogic {
     ShaderModule getVertexShaderModule();
     ShaderModule getFragmentShaderModule();
 
-    <T> boolean setUniform(String name, T value) throws PhotonException;
-    boolean useSampler(String name, int unit) throws PhotonException;
+    <T> IUniform<T> setUniform(String name, T value);
 
 }

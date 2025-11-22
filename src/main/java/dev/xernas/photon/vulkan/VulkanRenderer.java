@@ -4,6 +4,7 @@ import dev.xernas.photon.PhotonAPI;
 import dev.xernas.photon.api.*;
 import dev.xernas.photon.api.model.IMesh;
 import dev.xernas.photon.api.model.Model;
+import dev.xernas.photon.api.shader.IUniform;
 import dev.xernas.photon.api.shader.Shader;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.vulkan.device.VulkanDevice;
@@ -15,6 +16,10 @@ import dev.xernas.photon.vulkan.swapchain.VulkanRenderPass;
 import dev.xernas.photon.vulkan.swapchain.VulkanSwapChain;
 import dev.xernas.photon.api.window.Window;
 import org.lwjgl.glfw.GLFW;
+
+import java.awt.*;
+import java.util.List;
+import java.util.function.BiConsumer;
 
 public class VulkanRenderer implements IRenderer<VulkanShader, IMesh> {
 
@@ -46,7 +51,7 @@ public class VulkanRenderer implements IRenderer<VulkanShader, IMesh> {
     }
 
     @Override
-    public void render(VulkanShader shader, IMesh mesh) throws PhotonException {
+    public void render(VulkanShader shader, IMesh mesh, BiConsumer<IMesh, VulkanShader> operations) throws PhotonException {
 
     }
 
@@ -67,6 +72,11 @@ public class VulkanRenderer implements IRenderer<VulkanShader, IMesh> {
         swapChain.submitCommandBuffer(imageIndex, synchronisation, commandBuffer);
         int err = swapChain.presentImage(imageIndex, synchronisation, this);
         if (err == -1) recreateSwapChain();
+    }
+
+    @Override
+    public void setClearColor(Color color) throws PhotonException {
+
     }
 
     @Override

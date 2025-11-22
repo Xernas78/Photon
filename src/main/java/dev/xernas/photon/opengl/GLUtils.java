@@ -18,7 +18,7 @@ public class GLUtils {
 
     public static void clear(Color color) {
         clear();
-        GL45.glClearColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+        if (color != null) GL45.glClearColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
     }
 
     public static void viewport(Window window) {
