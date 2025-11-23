@@ -10,4 +10,6 @@ public interface IShader extends PhotonLogic {
 
     <T> IUniform<T> setUniform(String name, T value);
 
+    void changeShader(Shader shader) throws PhotonException;
+
 }

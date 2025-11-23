@@ -14,6 +14,7 @@ public class GLTexture implements ITexture {
 
     private final Texture image;
     private int textureId;
+    private int currentUnitID;
 
     public GLTexture(Texture image) {
         this.image = image;
@@ -36,6 +37,7 @@ public class GLTexture implements ITexture {
     public void bind(int unit) {
         if (lastBoundTextureId == textureId) return;
         GL45.glBindTextureUnit(unit, textureId);
+        currentUnitID = unit;
         lastBoundTextureId = textureId;
     }
 
@@ -47,6 +49,16 @@ public class GLTexture implements ITexture {
     @Override
     public void dispose() throws PhotonException {
         GL45.glDeleteTextures(textureId);
+    }
+
+    @Override
+    public Texture getTexture() {
+        return image;
+    }
+
+    @Override
+    public int getCurrentUnitID() {
+        return currentUnitID;
     }
 
 }

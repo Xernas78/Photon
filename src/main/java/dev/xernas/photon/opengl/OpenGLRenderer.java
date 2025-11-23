@@ -2,10 +2,7 @@ package dev.xernas.photon.opengl;
 
 import dev.xernas.photon.PhotonAPI;
 import dev.xernas.photon.api.IRenderer;
-import dev.xernas.photon.api.model.IMesh;
 import dev.xernas.photon.api.model.Model;
-import dev.xernas.photon.api.shader.IShader;
-import dev.xernas.photon.api.shader.IUniform;
 import dev.xernas.photon.api.shader.Shader;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.api.window.Window;
@@ -16,10 +13,7 @@ import org.lwjgl.opengl.GLUtil;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class OpenGLRenderer implements IRenderer<GLShader, GLMesh> {
 

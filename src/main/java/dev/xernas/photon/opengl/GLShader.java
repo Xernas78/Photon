@@ -50,6 +50,14 @@ public class GLShader implements IShader {
     }
 
     @Override
+    public void changeShader(Shader shader) throws PhotonException {
+        dispose();
+        this.vertexShader = new GLShaderModule(shader.getVertexResource(), ShaderType.VERTEX);
+        this.fragmentShader = new GLShaderModule(shader.getFragmentResource(), ShaderType.FRAGMENT);
+        start();
+    }
+
+    @Override
     public void start() throws PhotonException {
         vertexShader.start();
         fragmentShader.start();
@@ -67,13 +75,6 @@ public class GLShader implements IShader {
     public void unbind() {
         GL45.glUseProgram(0);
         lastBoundProgramId = 0;
-    }
-
-    public void changeShader(Shader shader) throws PhotonException {
-        dispose();
-        this.vertexShader = new GLShaderModule(shader.getVertexResource(), ShaderType.VERTEX);
-        this.fragmentShader = new GLShaderModule(shader.getFragmentResource(), ShaderType.FRAGMENT);
-        start();
     }
 
     private int getProgram() throws PhotonException {
@@ -126,6 +127,7 @@ public class GLShader implements IShader {
 
     @Override
     public void dispose() throws PhotonException {
+        uniforms.clear();
         GL45.glDeleteProgram(programId);
     }
 

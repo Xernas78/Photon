@@ -41,6 +41,11 @@ public class VulkanShader implements IShader {
     }
 
     @Override
+    public void changeShader(Shader shader) throws PhotonException {
+
+    }
+
+    @Override
     public void start() throws PhotonException {
         ShaderCompiler.SPIRV vertexSPIRV = ShaderCompiler.compileShaderCodeToSPIRV(vertexResource.filename(), vertexResource.shaderCode(), ShaderType.VERTEX);
         ShaderCompiler.SPIRV fragmentSPIRV = ShaderCompiler.compileShaderCodeToSPIRV(fragmentResource.filename(), fragmentResource.shaderCode(), ShaderType.FRAGMENT);

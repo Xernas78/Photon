@@ -4,4 +4,7 @@ import dev.xernas.photon.api.PhotonLogic;
 
 public interface ITexture extends PhotonLogic {
 
+    Texture getTexture();
+    int getCurrentUnitID();
+
 }

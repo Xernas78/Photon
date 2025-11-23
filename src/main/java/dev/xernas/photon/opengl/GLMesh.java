@@ -1,5 +1,6 @@
 package dev.xernas.photon.opengl;
 
+import dev.xernas.photon.api.material.Material;
 import dev.xernas.photon.api.model.IMesh;
 import dev.xernas.photon.api.model.Model;
 import dev.xernas.photon.api.PhotonLogic;
@@ -29,6 +30,11 @@ public class GLMesh implements IMesh {
     }
 
     @Override
+    public Material getMaterial() {
+        return model.getMaterial();
+    }
+
+    @Override
     public void start() throws PhotonException {
         // Checks
         if (model.getVertices() == null || model.getIndices() == null || model.getMaterial() == null) throw new PhotonException("Model vertices or indices are null");
@@ -37,7 +43,7 @@ public class GLMesh implements IMesh {
         GLBufferObject verticesBuffer = new GLBufferObject(GLBufferObject.GLBufferType.VERTEX, GLBufferObject.GLDataType.VERTICES);
         GLBufferObject indicesBuffer = new GLBufferObject(GLBufferObject.GLBufferType.ELEMENT);
         GLBufferObject texCoordsBuffer = null;
-        if (hasTexture()) texCoordsBuffer = new GLBufferObject(GLBufferObject.GLBufferType.VERTEX, GLBufferObject.GLDataType.UVS);
+        if (model.getTexCoords() != null && model.getTexCoords().length > 0) texCoordsBuffer = new GLBufferObject(GLBufferObject.GLBufferType.VERTEX, GLBufferObject.GLDataType.UVS);
 
         if (hasTexture()) texture = (GLTexture) model.getMaterial().getApiTexture();
         if (hasTexture()) texture.start();
@@ -48,7 +54,7 @@ public class GLMesh implements IMesh {
         // Store data in buffers
         verticesBuffer.storeBuffer(model.getVertices());
         indicesBuffer.storeBuffer(model.getIndices());
-        if (hasTexture() && texCoordsBuffer != null) {
+        if (texCoordsBuffer != null) {
             float[] src = model.getTexCoords();
             // Inverse V (y) : v -> 1 - v
             float[] flipped = new float[src.length];
@@ -61,7 +67,7 @@ public class GLMesh implements IMesh {
 
         // Create attributes
         vao.createBufferAttribute(verticesBuffer, 0);
-        if (hasTexture() && texCoordsBuffer != null) vao.createBufferAttribute(texCoordsBuffer, 1);
+        if (texCoordsBuffer != null) vao.createBufferAttribute(texCoordsBuffer, 1);
     }
 
     public boolean hasTexture() {
@@ -73,9 +79,11 @@ public class GLMesh implements IMesh {
         lastBoundMeshId = vao.getId();
         if (hasTexture()) texture.bind(0);
         GL45.glEnableVertexAttribArray(0);
+        if (model.getTexCoords() != null && model.getTexCoords().length > 0) GL45.glEnableVertexAttribArray(1);
     }
 
     public void unbind() {
+        if (model.getTexCoords() != null && model.getTexCoords().length > 0) GL45.glDisableVertexAttribArray(1);
         GL45.glDisableVertexAttribArray(0);
         if (hasTexture()) texture.unbind(0);
         GL45.glBindVertexArray(0);
