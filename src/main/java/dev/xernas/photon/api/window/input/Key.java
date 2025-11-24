@@ -99,4 +99,8 @@ public enum Key {
         return qwerty;
     }
 
+    public boolean isMouseButton() {
+        return this == MOUSE_LEFT || this == MOUSE_RIGHT || this == MOUSE_MIDDLE || this == MOUSE_BUTTON_4 || this == MOUSE_BUTTON_5;
+    }
+
 }

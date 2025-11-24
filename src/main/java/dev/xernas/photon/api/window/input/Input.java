@@ -1,6 +1,7 @@
 package dev.xernas.photon.api.window.input;
 
 import dev.xernas.photon.api.window.Window;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,15 +30,20 @@ public class Input {
         return keyMap.getOrDefault(key, Action.IDLE);
     }
 
-    public boolean isReleasing(Key key) {
+    public boolean isPressing(Key key) {
+        if (key.isMouseButton()) return GLFW.glfwGetMouseButton(window.getHandle(), key.getQwerty()) == GLFW.GLFW_PRESS;
+        else return GLFW.glfwGetKey(window.getHandle(), key.getQwerty()) == GLFW.GLFW_PRESS;
+    }
+
+    public boolean hasReleased(Key key) {
         return getKeyAction(key) == Action.RELEASE;
     }
 
-    public boolean isHolding(Key key) {
+    public boolean hasHold(Key key) {
         return getKeyAction(key) == Action.HOLD;
     }
 
-    public boolean isPressing(Key button) {
+    public boolean hasPressed(Key button) {
         return getKeyAction(button) == Action.PRESS;
     }
 
