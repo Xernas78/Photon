@@ -5,5 +5,6 @@ import dev.xernas.photon.api.PhotonLogic;
 public interface IMesh extends PhotonLogic {
 
     int getVertexCount();
+    Model getModel();
 
 }

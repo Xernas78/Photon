@@ -40,8 +40,8 @@ public class VulkanInstance implements PhotonLogic {
             int minor = Integer.parseInt(appVersionParts[1]);
             if (appVersionParts.length > 2) appInfo.applicationVersion(VK10.VK_MAKE_VERSION(major, minor, Integer.parseInt(appVersionParts[2])));
             else appInfo.applicationVersion(VK10.VK_MAKE_VERSION(major, minor, 0));
-            appInfo.pEngineName(stack.UTF8(PhotonAPI.getEngineName()));
-            String[] engineVersionParts = PhotonAPI.getEngineVersion().split("\\.");
+            appInfo.pEngineName(stack.UTF8(PhotonAPI.NAME));
+            String[] engineVersionParts = PhotonAPI.VERSION.split("\\.");
             major = Integer.parseInt(engineVersionParts[0]);
             minor = Integer.parseInt(engineVersionParts[1]);
             if (engineVersionParts.length > 2) appInfo.engineVersion(VK10.VK_MAKE_VERSION(major, minor, Integer.parseInt(engineVersionParts[2])));

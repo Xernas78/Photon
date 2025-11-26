@@ -38,6 +38,8 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         framebuffer.bind();
         // Binds
         shader.bind();
+        if (mesh.getModel().is3D()) GLUtils.enableDepthTest();
+        else GLUtils.disableDepthTest();
         mesh.bind();
         // Operations
         operations.accept(mesh, shader);

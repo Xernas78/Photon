@@ -29,6 +29,11 @@ public class GLMesh implements IMesh {
     }
 
     @Override
+    public Model getModel() {
+        return model;
+    }
+
+    @Override
     public void start() throws PhotonException {
         // Checks
         if (model.getVertices() == null || model.getIndices() == null) throw new GLException("Model vertices or indices are null");

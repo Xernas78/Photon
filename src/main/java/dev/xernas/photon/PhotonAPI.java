@@ -11,20 +11,19 @@ import dev.xernas.photon.api.window.Window;
 
 public class PhotonAPI {
 
+    public static final String NAME = "Photon";
+    public static final String VERSION = "1.1.0";
+
     private static Library library;
     private static boolean initialized = false;
     private static String appName;
     private static String appVersion;
-    private static String engineName;
-    private static String engineVersion;
     private static boolean debug;
 
-    public static void init(Library lib, String appName, String appVersion, String engineName, String engineVersion, boolean debug) {
+    public static void init(Library lib, String appName, String appVersion, boolean debug) {
         PhotonAPI.library = lib;
         PhotonAPI.appName = appName;
         PhotonAPI.appVersion = appVersion;
-        PhotonAPI.engineName = engineName;
-        PhotonAPI.engineVersion = engineVersion;
         PhotonAPI.debug = debug;
         PhotonAPI.initialized = true;
     }
@@ -39,14 +38,6 @@ public class PhotonAPI {
 
     public static String getAppVersion() {
         return appVersion;
-    }
-
-    public static String getEngineName() {
-        return engineName;
-    }
-
-    public static String getEngineVersion() {
-        return engineVersion;
     }
 
     public static boolean isDebug() {

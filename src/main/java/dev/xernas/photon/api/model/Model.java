@@ -40,6 +40,10 @@ public class Model {
         return normals;
     }
 
+    public boolean is3D() {
+        return vertices[2] != 0f;
+    }
+
     public Model flipV() {
         flipV = !flipV;
         return this;
