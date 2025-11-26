@@ -1,5 +1,6 @@
 package dev.xernas.photon;
 
+import dev.xernas.photon.api.framebuffer.IFramebuffer;
 import dev.xernas.photon.api.model.IMesh;
 import dev.xernas.photon.api.IRenderer;
 import dev.xernas.photon.api.shader.IShader;
@@ -67,7 +68,7 @@ public enum Library {
         return null;
     }
 
-    public IRenderer<? extends IShader, ? extends IMesh> createRenderer(Window window, boolean vsync, boolean debug) throws PhotonException {
+    public IRenderer<? extends IFramebuffer, ? extends IShader, ? extends IMesh, ? extends ITexture> createRenderer(Window window, boolean vsync, boolean debug) throws PhotonException {
         if (isVulkan()) {
             throw new PhotonException("Vulkan is in development and not yet supported.");
             // return new VulkanRenderer(window, vsync, debug);

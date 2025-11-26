@@ -4,6 +4,7 @@ import dev.xernas.photon.api.shader.IShader;
 import dev.xernas.photon.api.shader.IUniform;
 import dev.xernas.photon.api.shader.Shader;
 import dev.xernas.photon.api.shader.ShaderModule;
+import dev.xernas.photon.api.texture.ITexture;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.utils.ShaderCompiler;
 import dev.xernas.photon.utils.ShaderResource;
@@ -38,6 +39,11 @@ public class VulkanShader implements IShader {
     @Override
     public <T> IUniform<T> setUniform(String name, T value) {
         return null;
+    }
+
+    @Override
+    public boolean useTexture(String name, ITexture texture, int slot) {
+        return false;
     }
 
     @Override

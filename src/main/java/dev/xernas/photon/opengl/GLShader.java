@@ -3,6 +3,8 @@ package dev.xernas.photon.opengl;
 import dev.xernas.photon.api.shader.IShader;
 import dev.xernas.photon.api.shader.Shader;
 import dev.xernas.photon.api.shader.ShaderModule;
+import dev.xernas.photon.api.texture.ITexture;
+import dev.xernas.photon.exceptions.GLException;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.utils.GlobalUtilitaries;
 import dev.xernas.photon.utils.ShaderType;
@@ -50,11 +52,28 @@ public class GLShader implements IShader {
     }
 
     @Override
+    public boolean useTexture(String name, ITexture texture, int slot) {
+        GLTexture glTexture = (GLTexture) texture;
+        glTexture.bind(slot);
+        return setUniform(name, slot) != null;
+    }
+
+    @Override
     public void changeShader(Shader shader) throws PhotonException {
-        dispose();
-        this.vertexShader = new GLShaderModule(shader.getVertexResource(), ShaderType.VERTEX);
-        this.fragmentShader = new GLShaderModule(shader.getFragmentResource(), ShaderType.FRAGMENT);
-        start();
+        GLShaderModule oldVertexShader = this.vertexShader;
+        GLShaderModule oldFragmentShader = this.fragmentShader;
+        try {
+            dispose();
+            this.vertexShader = new GLShaderModule(shader.getVertexResource(), ShaderType.VERTEX);
+            this.fragmentShader = new GLShaderModule(shader.getFragmentResource(), ShaderType.FRAGMENT);
+            start();
+        } catch (PhotonException e) {
+            dispose();
+            this.vertexShader = oldVertexShader;
+            this.fragmentShader = oldFragmentShader;
+            start();
+            throw e;
+        }
     }
 
     @Override
@@ -79,11 +98,11 @@ public class GLShader implements IShader {
 
     private int getProgram() throws PhotonException {
         int program = GlobalUtilitaries.requireNotEquals(GL45.glCreateProgram(), 0, "Error creating shader program");
-        if (program == 0) throw new PhotonException("Could not create program");
+        if (program == 0) throw new GLException("Could not create program");
         GL45.glAttachShader(program, vertexShader.getShaderId());
         GL45.glAttachShader(program, fragmentShader.getShaderId());
         GL45.glLinkProgram(program);
-        if (GL45.glGetProgrami(program, GL45.GL_LINK_STATUS) == GL20.GL_FALSE) throw new PhotonException("Could not link shader program");
+        if (GL45.glGetProgrami(program, GL45.GL_LINK_STATUS) == GL20.GL_FALSE) throw new GLException("Could not link shader program");
 
         if (vertexShader.getShaderId() != 0) {
             GL45.glDetachShader(program, vertexShader.getShaderId());
@@ -95,7 +114,7 @@ public class GLShader implements IShader {
         }
 
         GL45.glValidateProgram(program);
-        if (GL45.glGetProgrami(program, GL45.GL_VALIDATE_STATUS) == GL20.GL_FALSE) throw new PhotonException("Could not validate shader program");
+        if (GL45.glGetProgrami(program, GL45.GL_VALIDATE_STATUS) == GL20.GL_FALSE) throw new GLException("Could not validate shader program");
         return program;
     }
 
@@ -128,7 +147,9 @@ public class GLShader implements IShader {
     @Override
     public void dispose() throws PhotonException {
         uniforms.clear();
+        if (programId == 0) return;
         GL45.glDeleteProgram(programId);
+        programId = 0;
     }
 
     public int getProgramId() {

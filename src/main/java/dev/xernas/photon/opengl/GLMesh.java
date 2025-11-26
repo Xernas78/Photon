@@ -1,9 +1,9 @@
 package dev.xernas.photon.opengl;
 
-import dev.xernas.photon.api.material.Material;
 import dev.xernas.photon.api.model.IMesh;
 import dev.xernas.photon.api.model.Model;
 import dev.xernas.photon.api.PhotonLogic;
+import dev.xernas.photon.exceptions.GLException;
 import dev.xernas.photon.exceptions.PhotonException;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL45;
@@ -18,7 +18,6 @@ public class GLMesh implements IMesh {
     private final Model model;
 
     private VAO vao;
-    private GLTexture texture;
 
     public GLMesh(Model model) {
         this.model = model;
@@ -30,23 +29,15 @@ public class GLMesh implements IMesh {
     }
 
     @Override
-    public Material getMaterial() {
-        return model.getMaterial();
-    }
-
-    @Override
     public void start() throws PhotonException {
         // Checks
-        if (model.getVertices() == null || model.getIndices() == null || model.getMaterial() == null) throw new PhotonException("Model vertices or indices are null");
+        if (model.getVertices() == null || model.getIndices() == null) throw new GLException("Model vertices or indices are null");
 
         // Create buffers
         GLBufferObject verticesBuffer = new GLBufferObject(GLBufferObject.GLBufferType.VERTEX, GLBufferObject.GLDataType.VERTICES);
         GLBufferObject indicesBuffer = new GLBufferObject(GLBufferObject.GLBufferType.ELEMENT);
         GLBufferObject texCoordsBuffer = null;
-        if (model.getTexCoords() != null && model.getTexCoords().length > 0) texCoordsBuffer = new GLBufferObject(GLBufferObject.GLBufferType.VERTEX, GLBufferObject.GLDataType.UVS);
-
-        if (hasTexture()) texture = (GLTexture) model.getMaterial().getApiTexture();
-        if (hasTexture()) texture.start();
+        if (hasTexCoords()) texCoordsBuffer = new GLBufferObject(GLBufferObject.GLBufferType.VERTEX, GLBufferObject.GLDataType.UVS);
 
         vao = new VAO(verticesBuffer, indicesBuffer, texCoordsBuffer);
         vao.start();
@@ -54,45 +45,33 @@ public class GLMesh implements IMesh {
         // Store data in buffers
         verticesBuffer.storeBuffer(model.getVertices());
         indicesBuffer.storeBuffer(model.getIndices());
-        if (texCoordsBuffer != null) {
-            float[] src = model.getTexCoords();
-            // Inverse V (y) : v -> 1 - v
-            float[] flipped = new float[src.length];
-            for (int i = 0; i < src.length; i += 2) {
-                flipped[i] = src[i]; // u
-                if (i + 1 < src.length) flipped[i + 1] = 1.0f - src[i + 1]; // v
-            }
-            texCoordsBuffer.storeBuffer(flipped);
-        }
+        if (texCoordsBuffer != null) texCoordsBuffer.storeBuffer(model.getTexCoords());
 
         // Create attributes
         vao.createBufferAttribute(verticesBuffer, 0);
         if (texCoordsBuffer != null) vao.createBufferAttribute(texCoordsBuffer, 1);
     }
 
-    public boolean hasTexture() {
-        return model.getTexCoords() != null && model.getTexCoords().length != 0 && model.getMaterial().hasTexture();
+    public boolean hasTexCoords() {
+        return model.getTexCoords() != null && model.getTexCoords().length != 0;
     }
 
     public void bind() {
         if (lastBoundMeshId != vao.getId()) GL45.glBindVertexArray(vao.getId());
         lastBoundMeshId = vao.getId();
-        if (hasTexture()) texture.bind(0);
         GL45.glEnableVertexAttribArray(0);
-        if (model.getTexCoords() != null && model.getTexCoords().length > 0) GL45.glEnableVertexAttribArray(1);
+        if (hasTexCoords()) GL45.glEnableVertexAttribArray(1);
     }
 
     public void unbind() {
-        if (model.getTexCoords() != null && model.getTexCoords().length > 0) GL45.glDisableVertexAttribArray(1);
+        if (hasTexCoords()) GL45.glDisableVertexAttribArray(1);
         GL45.glDisableVertexAttribArray(0);
-        if (hasTexture()) texture.unbind(0);
         GL45.glBindVertexArray(0);
         lastBoundMeshId = 0;
     }
 
     @Override
     public void dispose() throws PhotonException {
-        if (hasTexture()) texture.dispose();
         vao.dispose();
     }
 
@@ -157,7 +136,7 @@ public class GLMesh implements IMesh {
         public void attach(VAO vao) throws PhotonException {
             switch (type) {
                 case VERTEX -> {
-                    if (dataType == null) throw new PhotonException("Data type must be specified for vertex buffer");
+                    if (dataType == null) throw new GLException("Data type must be specified for vertex buffer");
                     GL45.glVertexArrayVertexBuffer(vao.getId(), dataType.getBindingIndex(), id, 0, dataType.getStride());
                 }
                 case ELEMENT -> GL45.glVertexArrayElementBuffer(vao.getId(), id);

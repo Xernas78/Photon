@@ -2,10 +2,14 @@ package dev.xernas.photon.vulkan;
 
 import dev.xernas.photon.PhotonAPI;
 import dev.xernas.photon.api.*;
+import dev.xernas.photon.api.framebuffer.Framebuffer;
+import dev.xernas.photon.api.framebuffer.IFramebuffer;
 import dev.xernas.photon.api.model.IMesh;
 import dev.xernas.photon.api.model.Model;
 import dev.xernas.photon.api.shader.IUniform;
 import dev.xernas.photon.api.shader.Shader;
+import dev.xernas.photon.api.texture.ITexture;
+import dev.xernas.photon.api.texture.Texture;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.vulkan.device.VulkanDevice;
 import dev.xernas.photon.vulkan.device.VulkanPhysicalDevice;
@@ -21,7 +25,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class VulkanRenderer implements IRenderer<VulkanShader, IMesh> {
+public class VulkanRenderer implements IRenderer<IFramebuffer, VulkanShader, IMesh, ITexture> {
 
     private final Window window;
 
@@ -51,8 +55,13 @@ public class VulkanRenderer implements IRenderer<VulkanShader, IMesh> {
     }
 
     @Override
-    public void render(VulkanShader shader, IMesh mesh, BiConsumer<IMesh, VulkanShader> operations) throws PhotonException {
+    public void render(IFramebuffer framebuffer, VulkanShader shader, IMesh mesh, BiConsumer<IMesh, VulkanShader> operations) throws PhotonException {
 
+    }
+
+    @Override
+    public IFramebuffer getDefaultFramebuffer() throws PhotonException {
+        return null;
     }
 
     @Override
@@ -75,8 +84,13 @@ public class VulkanRenderer implements IRenderer<VulkanShader, IMesh> {
     }
 
     @Override
-    public void setClearColor(Color color) throws PhotonException {
+    public void clear(Color color) throws PhotonException {
 
+    }
+
+    @Override
+    public ITexture loadTexture(Texture texture) throws PhotonException {
+        return null;
     }
 
     @Override
@@ -86,6 +100,11 @@ public class VulkanRenderer implements IRenderer<VulkanShader, IMesh> {
 
     @Override
     public VulkanShader loadShader(Shader shader) throws PhotonException {
+        return null;
+    }
+
+    @Override
+    public IFramebuffer loadFramebuffer(Framebuffer framebuffer) throws PhotonException {
         return null;
     }
 

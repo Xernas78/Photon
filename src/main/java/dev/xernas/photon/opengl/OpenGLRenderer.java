@@ -2,29 +2,30 @@ package dev.xernas.photon.opengl;
 
 import dev.xernas.photon.PhotonAPI;
 import dev.xernas.photon.api.IRenderer;
+import dev.xernas.photon.api.framebuffer.Framebuffer;
 import dev.xernas.photon.api.model.Model;
 import dev.xernas.photon.api.shader.Shader;
+import dev.xernas.photon.api.texture.Texture;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.api.window.Window;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GLUtil;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class OpenGLRenderer implements IRenderer<GLShader, GLMesh> {
+public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh, GLTexture> {
 
     private final Window window;
     private final boolean vsync;
     private final boolean debug;
 
+    private final List<GLFramebuffer> loadedFramebuffers = new ArrayList<>();
     private final List<GLShader> loadedShaders = new ArrayList<>();
     private final List<GLMesh> loadedMeshes = new ArrayList<>();
-
-    private Color clearColor;
+    private final List<GLTexture> loadedTextures = new ArrayList<>();
 
     public OpenGLRenderer(Window window, boolean vsync, boolean debug) {
         this.window = window;
@@ -33,7 +34,8 @@ public class OpenGLRenderer implements IRenderer<GLShader, GLMesh> {
     }
 
     @Override
-    public void render(GLShader shader, GLMesh mesh, BiConsumer<GLMesh, GLShader> operations) throws PhotonException {
+    public void render(GLFramebuffer framebuffer, GLShader shader, GLMesh mesh, BiConsumer<GLMesh, GLShader> operations) {
+        framebuffer.bind();
         // Binds
         shader.bind();
         mesh.bind();
@@ -44,14 +46,19 @@ public class OpenGLRenderer implements IRenderer<GLShader, GLMesh> {
     }
 
     @Override
-    public void swapBuffers() {
-        GLFW.glfwSwapBuffers(window.getHandle());
-        GLUtils.clear(clearColor);
+    public GLFramebuffer getDefaultFramebuffer() throws PhotonException {
+        return OpenGLConstants.DEFAULT_FRAMEBUFFER;
     }
 
     @Override
-    public void setClearColor(Color color) throws PhotonException {
-        clearColor = color;
+    public void swapBuffers() throws PhotonException {
+        resizeFramebuffers();
+        GLFW.glfwSwapBuffers(window.getHandle());
+    }
+
+    @Override
+    public void clear(Color color) {
+        GLUtils.clear(color);
     }
 
     @Override
@@ -62,9 +69,23 @@ public class OpenGLRenderer implements IRenderer<GLShader, GLMesh> {
         GL.createCapabilities();
         GLUtils.viewport(window);
         if (debug) {
-            System.out.println("OpenGL Starting with Renderer: " + GLUtils.getRendererInfo());
-            GLUtil.setupDebugMessageCallback(System.err);
+            System.out.println("[Photon] OpenGL Starting with Renderer: " + GLUtils.getRendererInfo());
+            GLUtils.setupDebugMessageCallback();
         }
+    }
+
+    private void resizeFramebuffers() throws PhotonException {
+        if (!window.framebufferResized()) return;
+        for (GLFramebuffer framebuffer : loadedFramebuffers) framebuffer.resize(window.getWidth(), window.getHeight());
+        window.setFramebufferResized(false);
+    }
+
+    @Override
+    public GLFramebuffer loadFramebuffer(Framebuffer framebuffer) throws PhotonException {
+        GLFramebuffer glFramebuffer = new GLFramebuffer(window.getWidth(), window.getHeight(), framebuffer.getAttachments());
+        glFramebuffer.start();
+        loadedFramebuffers.add(glFramebuffer);
+        return glFramebuffer;
     }
 
     @Override
@@ -84,8 +105,24 @@ public class OpenGLRenderer implements IRenderer<GLShader, GLMesh> {
     }
 
     @Override
+    public GLTexture loadTexture(Texture texture) throws PhotonException {
+        GLTexture glTexture = new GLTexture(texture);
+        glTexture.start();
+        loadedTextures.add(glTexture);
+        return glTexture;
+    }
+
+
+
+    @Override
     public void dispose() throws PhotonException {
+        for (GLTexture texture : loadedTextures) texture.dispose();
         for (GLMesh mesh : loadedMeshes) mesh.dispose();
         for (GLShader shader : loadedShaders) shader.dispose();
+        for (GLFramebuffer framebuffer : loadedFramebuffers) framebuffer.dispose();
+        loadedTextures.clear();
+        loadedMeshes.clear();
+        loadedShaders.clear();
+        loadedFramebuffers.clear();
     }
 }

@@ -2,6 +2,7 @@ package dev.xernas.photon.vulkan;
 
 import dev.xernas.photon.api.PhotonLogic;
 import dev.xernas.photon.exceptions.PhotonException;
+import dev.xernas.photon.exceptions.VulkanException;
 import dev.xernas.photon.vulkan.device.VulkanDevice;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
@@ -37,7 +38,7 @@ public class VulkanSynchronisation implements PhotonLogic {
             if (VK10.vkCreateSemaphore(device.getDevice(), semaphoreInfo, null, pimageAvailableSemaphore) != VK10.VK_SUCCESS ||
                     VK10.vkCreateSemaphore(device.getDevice(), semaphoreInfo, null, prederFinishedSemaphore) != VK10.VK_SUCCESS ||
                     VK10.vkCreateFence(device.getDevice(), fenceInfo, null, pInFlightFence) != VK10.VK_SUCCESS) {
-                throw new PhotonException("Failed to create synchronization objects for a frame");
+                throw new VulkanException("Failed to create synchronization objects for a frame");
             }
 
             imageAvailableSemaphore = pimageAvailableSemaphore.get(0);

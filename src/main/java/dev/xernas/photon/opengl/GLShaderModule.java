@@ -1,6 +1,7 @@
 package dev.xernas.photon.opengl;
 
 import dev.xernas.photon.api.shader.ShaderModule;
+import dev.xernas.photon.exceptions.GLException;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.utils.GlobalUtilitaries;
 import dev.xernas.photon.utils.ShaderResource;
@@ -24,7 +25,7 @@ public class GLShaderModule implements ShaderModule {
         shaderId = GlobalUtilitaries.requireNotEquals(GL20.glCreateShader(shaderType.toOpenGLConstant()), 0, "Error creating " + shaderType.name() + " shader");
         GL20.glShaderSource(shaderId, shaderResource.shaderCode());
         GL20.glCompileShader(shaderId);
-        if (GL20.glGetShaderi(shaderId, GL20.GL_COMPILE_STATUS) == GL20.GL_FALSE) throw new PhotonException("Error compiling " + shaderType.name() + " shader: " + GL20.glGetShaderInfoLog(shaderId));
+        if (GL20.glGetShaderi(shaderId, GL20.GL_COMPILE_STATUS) == GL20.GL_FALSE) throw new GLException("Error compiling " + shaderType.name() + " shader: " + GL20.glGetShaderInfoLog(shaderId));
     }
 
     @Override

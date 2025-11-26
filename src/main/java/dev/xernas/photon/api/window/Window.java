@@ -3,8 +3,10 @@ package dev.xernas.photon.api.window;
 import dev.xernas.photon.PhotonAPI;
 import dev.xernas.photon.api.PhotonLogic;
 import dev.xernas.photon.api.IRenderer;
+import dev.xernas.photon.api.framebuffer.IFramebuffer;
 import dev.xernas.photon.api.model.IMesh;
 import dev.xernas.photon.api.shader.IShader;
+import dev.xernas.photon.api.texture.ITexture;
 import dev.xernas.photon.api.window.cursor.Cursor;
 import dev.xernas.photon.api.window.cursor.CursorShape;
 import dev.xernas.photon.api.window.input.Action;
@@ -103,7 +105,7 @@ public class Window implements PhotonLogic {
         currentCursor.start();
     }
 
-    public void update(IRenderer<? extends IShader, ? extends IMesh> renderer) throws PhotonException {
+    public void update(IRenderer<? extends IFramebuffer, ? extends IShader, ? extends IMesh, ? extends ITexture> renderer) throws PhotonException {
         renderer.swapBuffers();
         GLFW.glfwPollEvents();
     }

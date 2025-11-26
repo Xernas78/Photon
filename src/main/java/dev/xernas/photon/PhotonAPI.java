@@ -1,5 +1,6 @@
 package dev.xernas.photon;
 
+import dev.xernas.photon.api.framebuffer.IFramebuffer;
 import dev.xernas.photon.api.model.IMesh;
 import dev.xernas.photon.api.IRenderer;
 import dev.xernas.photon.api.shader.IShader;
@@ -57,9 +58,9 @@ public class PhotonAPI {
         return library.createTexture(texture);
     }
 
-    public static IRenderer<IShader, IMesh> getRenderer(Window window, boolean vsync) throws PhotonException {
+    public static IRenderer<IFramebuffer, IShader, IMesh, ITexture> getRenderer(Window window, boolean vsync) throws PhotonException {
         if (!initialized) throw new IllegalStateException("PhotonAPI is not initialized. Call PhotonAPI.init() first.");
-        return (IRenderer<IShader, IMesh>) library.createRenderer(window, vsync, debug);
+        return (IRenderer<IFramebuffer, IShader, IMesh, ITexture>) library.createRenderer(window, vsync, debug);
     }
 
     public static boolean isInitialized() {
