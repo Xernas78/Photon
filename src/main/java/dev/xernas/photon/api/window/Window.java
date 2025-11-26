@@ -154,8 +154,8 @@ public class Window implements PhotonLogic {
         GLFW.glfwIconifyWindow(handle);
     }
 
-    public boolean shouldClose() {
-        return GLFW.glfwWindowShouldClose(handle);
+    public boolean isOpen() {
+        return !GLFW.glfwWindowShouldClose(handle);
     }
 
     public void resize(int width, int height) {
