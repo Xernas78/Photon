@@ -49,6 +49,14 @@ public class GLUtils {
         GL45.glDisable(GL45.GL_DEPTH_TEST);
     }
 
+    public static void enableBackfaceCulling() {
+        GL45.glEnable(GL45.GL_CULL_FACE);
+    }
+
+    public static void disableBackfaceCulling() {
+        GL45.glDisable(GL45.GL_CULL_FACE);
+    }
+
     public static String getRendererInfo() {
         return GL45.glGetString(GL45.GL_RENDERER);
     }
