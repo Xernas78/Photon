@@ -9,6 +9,27 @@ public class Model {
 
     private boolean flipV = true;
 
+    public Model(Vertex[] vertices, int[] indices) {
+        this.vertices = new float[vertices.length * 3];
+        this.texCoords = new float[vertices.length * 2];
+        this.normals = new float[vertices.length * 3];
+        this.indices = indices;
+
+        for (int i = 0; i < vertices.length; i++) {
+            Vertex v = vertices[i];
+            this.vertices[i * 3] = v.x;
+            this.vertices[i * 3 + 1] = v.y;
+            this.vertices[i * 3 + 2] = v.z;
+
+            this.texCoords[i * 2] = v.u;
+            this.texCoords[i * 2 + 1] = v.v;
+
+            this.normals[i * 3] = v.normalX;
+            this.normals[i * 3 + 1] = v.normalY;
+            this.normals[i * 3 + 2] = v.normalZ;
+        }
+    }
+
     public Model(float[] vertices, int[] indices, float[] texCoords, float[] normals) {
         this.vertices = vertices;
         this.indices = indices;
@@ -48,4 +69,9 @@ public class Model {
         flipV = !flipV;
         return this;
     }
+
+    public record Vertex(float x, float y, float z, float u, float v, float normalX, float normalY, float normalZ) {
+
+    }
+
 }
