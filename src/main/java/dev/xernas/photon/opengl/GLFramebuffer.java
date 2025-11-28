@@ -39,7 +39,13 @@ public class GLFramebuffer implements IFramebuffer {
         framebufferId = GL45.glCreateFramebuffers();
         for (FramebufferAttachment attachment : attachments) {
             if (attachment.isTexture()) {
-                GLTexture textureAttachment = new GLTexture(width, height);
+                GLTexture.GLTextureComponent componentType = switch (attachment) {
+                    case COLOR_TEXTURE -> GLTexture.GLTextureComponent.RGBA;
+                    case DEPTH_TEXTURE -> GLTexture.GLTextureComponent.DEPTH;
+                    case DEPTH_STENCIL_TEXTURE -> GLTexture.GLTextureComponent.DEPTH_STENCIL;
+                    default -> throw new GLException("Invalid texture attachment type: " + attachment);
+                };
+                GLTexture textureAttachment = new GLTexture(width, height, componentType);
                 textureAttachment.start();
                 attach(attachment, textureAttachment);
             }
@@ -51,7 +57,7 @@ public class GLFramebuffer implements IFramebuffer {
         }
 
         int status = GL45.glCheckNamedFramebufferStatus(framebufferId, GL45.GL_FRAMEBUFFER);
-        if (status != GL45.GL_FRAMEBUFFER_COMPLETE) throw new GLException("Failed to create framebuffer: " + status);
+        if (status != GL45.GL_FRAMEBUFFER_COMPLETE) throw new GLException("Failed to create framebuffer: " + GLUtils.getError(status));
     }
 
     @Override
@@ -83,7 +89,6 @@ public class GLFramebuffer implements IFramebuffer {
                 GL45.glNamedFramebufferDrawBuffers(framebufferId, GL45.GL_COLOR_ATTACHMENT0);
             }
             case DEPTH_TEXTURE -> GL45.glNamedFramebufferTexture(framebufferId, GL45.GL_DEPTH_ATTACHMENT, texture.getTextureId(), 0);
-            case STENCIL_TEXTURE -> GL45.glNamedFramebufferTexture(framebufferId, GL45.GL_STENCIL_ATTACHMENT, texture.getTextureId(), 0);
             case DEPTH_STENCIL_TEXTURE -> GL45.glNamedFramebufferTexture(framebufferId, GL45.GL_DEPTH_STENCIL_ATTACHMENT, texture.getTextureId(), 0);
         }
         attachedTextures.put(attachment, texture);

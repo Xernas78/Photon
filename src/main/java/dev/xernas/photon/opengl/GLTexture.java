@@ -4,21 +4,30 @@ import dev.xernas.photon.api.texture.Texture;
 import dev.xernas.photon.api.texture.ITexture;
 import dev.xernas.photon.exceptions.PhotonException;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL45;
+
+import java.util.Objects;
 
 public class GLTexture implements ITexture {
 
     private static int lastBoundTextureId = 0;
 
     private final Texture image;
+    private final boolean hasDefaultData;
+    private final GLTextureComponent textureComponent;
     private int textureId;
 
-    public GLTexture(int width, int height) {
+    public GLTexture(int width, int height, GLTextureComponent textureComponent) {
         this.image = new Texture(width, height, null);
+        this.hasDefaultData = false;
+        this.textureComponent = textureComponent;
     }
 
     public GLTexture(Texture image) {
         this.image = image;
+        this.hasDefaultData = image.getData() != null;
+        this.textureComponent = GLTextureComponent.RGBA;
     }
 
     @Override
@@ -26,14 +35,15 @@ public class GLTexture implements ITexture {
         textureId = GL45.glCreateTextures(GL20.GL_TEXTURE_2D);
 
         int wrapMode = image.getData() != null ? GL20.GL_REPEAT : GL20.GL_CLAMP_TO_EDGE;
+        if (textureComponent == GLTextureComponent.DEPTH) GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_COMPARE_MODE, GL20.GL_NONE);
         GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_WRAP_S, wrapMode);
         GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_WRAP_T, wrapMode);
         GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_MIN_FILTER, GL20.GL_LINEAR);
         GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_MAG_FILTER, GL20.GL_LINEAR);
 
-        GL45.glTextureStorage2D(textureId, 1, GL20.GL_RGBA8, image.getWidth(), image.getHeight());
+        GL45.glTextureStorage2D(textureId, 1, textureComponent.componentSpecs, image.getWidth(), image.getHeight());
         if (image.getData() != null) {
-            GL45.glTextureSubImage2D(textureId, 0, 0, 0, image.getWidth(), image.getHeight(), GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, image.getData());
+            GL45.glTextureSubImage2D(textureId, 0, 0, 0, image.getWidth(), image.getHeight(), textureComponent.component, textureComponent.componentType, image.getData());
             GL45.glGenerateTextureMipmap(textureId);
         }
     }
@@ -62,4 +72,23 @@ public class GLTexture implements ITexture {
     public int getTextureId() {
         return textureId;
     }
+
+    public enum GLTextureComponent {
+
+        RGBA(GL20.GL_RGBA8, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE),
+        RGB(GL20.GL_RGB8, GL20.GL_RGB, GL20.GL_UNSIGNED_BYTE),
+        DEPTH(GL20.GL_DEPTH_COMPONENT24, GL20.GL_DEPTH_COMPONENT, GL20.GL_UNSIGNED_INT),
+        DEPTH_STENCIL(GL30.GL_DEPTH24_STENCIL8, GL30.GL_DEPTH_STENCIL, GL30.GL_UNSIGNED_INT_24_8);
+
+        private final int componentSpecs;
+        private final int component;
+        private final int componentType;
+
+        GLTextureComponent(int componentSpecs, int component, int componentType) {
+            this.componentSpecs = componentSpecs;
+            this.component = component;
+            this.componentType = componentType;
+        }
+    }
+
 }

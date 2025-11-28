@@ -57,6 +57,25 @@ public class GLUtils {
         GL45.glDisable(GL45.GL_CULL_FACE);
     }
 
+    public static String getError(int error) {
+        return switch (error) {
+            case GL45.GL_NO_ERROR -> "No error";
+            case GL45.GL_INVALID_ENUM -> "Invalid enum";
+            case GL45.GL_INVALID_VALUE -> "Invalid value";
+            case GL45.GL_INVALID_OPERATION -> "Invalid operation";
+            case GL45.GL_STACK_OVERFLOW -> "Stack overflow";
+            case GL45.GL_STACK_UNDERFLOW -> "Stack underflow";
+            case GL45.GL_OUT_OF_MEMORY -> "Out of memory";
+            case GL45.GL_INVALID_FRAMEBUFFER_OPERATION -> "Invalid framebuffer operation";
+            case GL45.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT -> "Frame buffer incomplete attachment";
+            case GL45.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT -> "Frame buffer incomplete missing attachment";
+            case GL45.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER -> "Frame buffer incomplete draw buffer";
+            case GL45.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER -> "Frame buffer incomplete read buffer";
+            case GL45.GL_FRAMEBUFFER_UNSUPPORTED -> "Frame buffer unsupported";
+            default -> "Unknown error";
+        };
+    }
+
     public static String getRendererInfo() {
         return GL45.glGetString(GL45.GL_RENDERER);
     }
