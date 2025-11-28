@@ -9,6 +9,9 @@ import java.awt.*;
 
 public class GLUtils {
 
+    private static boolean depthTestEnabled = false;
+    private static boolean backfaceCullingEnabled = false;
+
     public static void draw(int first, int count) {
         if (OpenGLConstants.DRAWING_METHOD.equals(OpenGLConstants.DrawingMethod.ARRAY)) GL45.glDrawArrays(OpenGLConstants.DRAW_MODE.toOpenGLConstant(), first, count);
         else GL45.glDrawElements(OpenGLConstants.DRAW_MODE.toOpenGLConstant(), count, GL45.GL_UNSIGNED_INT, first);
@@ -42,19 +45,27 @@ public class GLUtils {
     }
 
     public static void enableDepthTest() {
+        if (depthTestEnabled) return;
         GL45.glEnable(GL45.GL_DEPTH_TEST);
+        depthTestEnabled = true;
     }
 
     public static void disableDepthTest() {
+        if (!depthTestEnabled) return;
         GL45.glDisable(GL45.GL_DEPTH_TEST);
+        depthTestEnabled = false;
     }
 
     public static void enableBackfaceCulling() {
+        if (backfaceCullingEnabled) return;
         GL45.glEnable(GL45.GL_CULL_FACE);
+        backfaceCullingEnabled = true;
     }
 
     public static void disableBackfaceCulling() {
+        if (!backfaceCullingEnabled) return;
         GL45.glDisable(GL45.GL_CULL_FACE);
+        backfaceCullingEnabled = false;
     }
 
     public static String getError(int error) {

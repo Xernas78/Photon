@@ -34,7 +34,7 @@ public class GLTexture implements ITexture {
     public void start() throws PhotonException {
         textureId = GL45.glCreateTextures(GL20.GL_TEXTURE_2D);
 
-        int wrapMode = image.getData() != null ? GL20.GL_REPEAT : GL20.GL_CLAMP_TO_EDGE;
+        int wrapMode = hasDefaultData ? GL20.GL_REPEAT : GL20.GL_CLAMP_TO_EDGE;
         if (textureComponent == GLTextureComponent.DEPTH) GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_COMPARE_MODE, GL20.GL_NONE);
         GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_WRAP_S, wrapMode);
         GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_WRAP_T, wrapMode);
@@ -42,7 +42,7 @@ public class GLTexture implements ITexture {
         GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_MAG_FILTER, GL20.GL_LINEAR);
 
         GL45.glTextureStorage2D(textureId, 1, textureComponent.componentSpecs, image.getWidth(), image.getHeight());
-        if (image.getData() != null) {
+        if (hasDefaultData) {
             GL45.glTextureSubImage2D(textureId, 0, 0, 0, image.getWidth(), image.getHeight(), textureComponent.component, textureComponent.componentType, image.getData());
             GL45.glGenerateTextureMipmap(textureId);
         }

@@ -62,7 +62,8 @@ public class GLMesh implements IMesh {
     }
 
     public void bind() {
-        if (lastBoundMeshId != vao.getId()) GL45.glBindVertexArray(vao.getId());
+        if (lastBoundMeshId == vao.getId()) return;
+        GL45.glBindVertexArray(vao.getId());
         lastBoundMeshId = vao.getId();
         GL45.glEnableVertexAttribArray(0);
         if (hasTexCoords()) GL45.glEnableVertexAttribArray(1);
