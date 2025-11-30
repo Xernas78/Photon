@@ -38,14 +38,9 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         framebuffer.bind();
         // Binds
         shader.bind();
-        if (mesh.getModel().is3D()) {
-            GLUtils.enableDepthTest();
-            GLUtils.enableBackfaceCulling();
-        }
-        else {
-            GLUtils.disableBackfaceCulling();
-            GLUtils.disableDepthTest();
-        }
+        if (mesh.getModel().is3D()) GLUtils.enableBackfaceCulling();
+        else GLUtils.disableBackfaceCulling();
+
         mesh.bind();
         // Operations
         operations.accept(mesh, shader);
@@ -76,6 +71,7 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         GLFW.glfwSwapInterval(vsync ? 1 : 0);
         GL.createCapabilities();
         GLUtils.viewport(window);
+        GLUtils.enableDepthTest(); // Enable depth testing by default (TODO: Make configurable)
         if (debug) {
             System.out.println("[Photon] OpenGL Starting with Renderer: " + GLUtils.getRendererInfo());
             GLUtils.setupDebugMessageCallback();
