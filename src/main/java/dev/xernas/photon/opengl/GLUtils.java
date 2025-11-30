@@ -23,7 +23,10 @@ public class GLUtils {
 
     public static void clear(Color color) {
         clear();
-        if (color != null) GL45.glClearColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+        if (color != null) {
+            GL45.glClearColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+            GL45.glClearDepth(1.0f);
+        }
     }
 
     public static void clear(GLFramebuffer framebuffer, Color color) {
@@ -33,7 +36,8 @@ public class GLUtils {
                 color.getBlue() / 255f,
                 color.getAlpha() / 255f
         });
-        GL45.glClearNamedFramebufferfv(framebuffer.getFramebufferId(), GL45.GL_DEPTH, 0, new float[]{1f});
+        // Clear depth buffer
+        GL45.glClearNamedFramebufferfv(framebuffer.getFramebufferId(), GL45.GL_DEPTH, 0, new float[] {1.0f});
     }
 
     public static void viewport(Window window) {
@@ -47,6 +51,7 @@ public class GLUtils {
     public static void enableDepthTest() {
         if (depthTestEnabled) return;
         GL45.glEnable(GL45.GL_DEPTH_TEST);
+        GL45.glDepthMask(true);
         depthTestEnabled = true;
     }
 

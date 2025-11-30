@@ -42,23 +42,31 @@ public class GLMesh implements IMesh {
         GLBufferObject verticesBuffer = new GLBufferObject(GLBufferObject.GLBufferType.VERTEX, GLBufferObject.GLDataType.VERTICES);
         GLBufferObject indicesBuffer = new GLBufferObject(GLBufferObject.GLBufferType.ELEMENT);
         GLBufferObject texCoordsBuffer = null;
+        GLBufferObject normalsBuffer = null;
         if (hasTexCoords()) texCoordsBuffer = new GLBufferObject(GLBufferObject.GLBufferType.VERTEX, GLBufferObject.GLDataType.UVS);
+        if (hasNormals()) normalsBuffer = new GLBufferObject(GLBufferObject.GLBufferType.VERTEX, GLBufferObject.GLDataType.NORMALS);
 
-        vao = new VAO(verticesBuffer, indicesBuffer, texCoordsBuffer);
+        vao = new VAO(verticesBuffer, indicesBuffer, texCoordsBuffer, normalsBuffer);
         vao.start();
 
         // Store data in buffers
         verticesBuffer.storeBuffer(model.getVertices());
         indicesBuffer.storeBuffer(model.getIndices());
         if (texCoordsBuffer != null) texCoordsBuffer.storeBuffer(model.getTexCoords());
+        if (normalsBuffer != null) normalsBuffer.storeBuffer(model.getNormals());
 
         // Create attributes
         vao.createBufferAttribute(verticesBuffer, 0);
         if (texCoordsBuffer != null) vao.createBufferAttribute(texCoordsBuffer, 1);
+        if (normalsBuffer != null) vao.createBufferAttribute(normalsBuffer, 2);
     }
 
     public boolean hasTexCoords() {
         return model.getTexCoords() != null && model.getTexCoords().length != 0;
+    }
+
+    public boolean hasNormals() {
+        return model.getNormals() != null && model.getNormals().length != 0;
     }
 
     public void bind() {

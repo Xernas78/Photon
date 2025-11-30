@@ -35,11 +35,12 @@ public class GLTexture implements ITexture {
         textureId = GL45.glCreateTextures(GL20.GL_TEXTURE_2D);
 
         int wrapMode = hasDefaultData ? GL20.GL_REPEAT : GL20.GL_CLAMP_TO_EDGE;
+        int textureFilter = hasDefaultData ? GL20.GL_LINEAR : (textureComponent == GLTextureComponent.DEPTH ? GL20.GL_NEAREST : GL20.GL_LINEAR);
         if (textureComponent == GLTextureComponent.DEPTH) GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_COMPARE_MODE, GL20.GL_NONE);
         GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_WRAP_S, wrapMode);
         GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_WRAP_T, wrapMode);
-        GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_MIN_FILTER, GL20.GL_LINEAR);
-        GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_MAG_FILTER, GL20.GL_LINEAR);
+        GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_MIN_FILTER, textureFilter);
+        GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_MAG_FILTER, textureFilter);
 
         GL45.glTextureStorage2D(textureId, 1, textureComponent.componentSpecs, image.getWidth(), image.getHeight());
         if (hasDefaultData) {
