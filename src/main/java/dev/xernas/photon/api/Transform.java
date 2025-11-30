@@ -170,6 +170,16 @@ public class Transform {
             }
             pos.y += offset.y;
         }
+
+        public Vector3f getForwardVector() {
+            Vector3f forward = new Vector3f();
+            Vector3f rot = getRotation();
+            forward.x = (float) (Math.sin(Math.toRadians(rot.y)) * Math.cos(Math.toRadians(rot.x)));
+            forward.y = (float) Math.sin(Math.toRadians(-rot.x));
+            forward.z = (float) (Math.cos(Math.toRadians(rot.y)) * Math.cos(Math.toRadians(rot.x)));
+            forward.normalize();
+            return forward;
+        }
     }
 
 }
