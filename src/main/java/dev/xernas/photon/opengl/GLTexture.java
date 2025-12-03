@@ -7,11 +7,13 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL45;
 
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GLTexture implements ITexture {
 
     private static int lastBoundTextureId = 0;
+    private static int lastBoundUnit = -1;
 
     private final Texture image;
     private final boolean hasDefaultData;
@@ -50,14 +52,16 @@ public class GLTexture implements ITexture {
     }
 
     public void bind(int unit) {
-        if (lastBoundTextureId == textureId) return;
+        if (lastBoundTextureId == textureId && lastBoundUnit == unit) return;
         GL45.glBindTextureUnit(unit, textureId);
         lastBoundTextureId = textureId;
+        lastBoundUnit = unit;
     }
 
     public void unbind(int unit) {
         GL45.glBindTextureUnit(unit, 0);
         lastBoundTextureId = 0;
+        lastBoundUnit = -1;
     }
 
     @Override
