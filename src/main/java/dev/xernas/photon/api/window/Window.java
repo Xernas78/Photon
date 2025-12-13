@@ -14,6 +14,8 @@ import dev.xernas.photon.api.window.input.Input;
 import dev.xernas.photon.api.window.input.Key;
 import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.opengl.GLUtils;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -219,6 +221,48 @@ public class Window implements PhotonLogic {
         currentCursor = new Cursor(shape);
         currentCursor.start();
         GLFW.glfwSetCursor(handle, currentCursor.getHandle());
+    }
+
+    public Vector2f getMaxBounds() {
+        float aspectRatio;
+        float worldWidth, worldHeight;
+
+        if (width >= height) {
+            // Horizontal screen
+            aspectRatio = (float) width / height;
+            worldWidth = 2.0f * aspectRatio;
+            worldHeight = 2.0f;
+        } else {
+            // Vertical screen
+            aspectRatio = (float) height / width;
+            worldWidth = 2.0f;
+            worldHeight = 2.0f * aspectRatio;
+        }
+
+        return new Vector2f(worldWidth, worldHeight);
+    }
+
+    public Vector3f pixelToWorldCoords(int pixelX, int pixelY) {
+        return pixelToWorldCoords(pixelX, pixelY, 0.0f);
+    }
+
+    public Vector3f pixelToWorldCoords(int pixelX, int pixelY, float z) {
+        float aspectRatio;
+        float worldX, worldY;
+
+        if (width >= height) {
+            // Horizontal screen
+            aspectRatio = (float) width / height;
+            worldX = ((float) pixelX / width) * (2.0f * aspectRatio) - aspectRatio;
+            worldY = 1.0f - ((float) pixelY / height) * 2.0f;
+        } else {
+            // Vertical screen
+            aspectRatio = (float) height / width;
+            worldX = ((float) pixelX / width) * 2.0f - 1.0f;
+            worldY = 1.0f - ((float) pixelY / height) * (2.0f * aspectRatio);
+        }
+
+        return new Vector3f(worldX, worldY, z);
     }
 
     public boolean framebufferResized() {
