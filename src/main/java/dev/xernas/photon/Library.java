@@ -68,14 +68,14 @@ public enum Library {
         return null;
     }
 
-    public IRenderer<? extends IFramebuffer, ? extends IShader, ? extends IMesh, ? extends ITexture> createRenderer(Window window, boolean vsync, boolean debug) throws PhotonException {
+    public IRenderer<? extends IFramebuffer, ? extends IShader, ? extends IMesh, ? extends ITexture> createRenderer(Window window, boolean vsync, boolean debug) {
         if (isVulkan()) {
-            throw new PhotonException("Vulkan is in development and not yet supported.");
+            throw new IllegalStateException("Vulkan is in development and not yet supported.");
             // return new VulkanRenderer(window, vsync, debug);
         } else if (isOpenGL()) {
             return new OpenGLRenderer(window, vsync, debug);
         }
-        throw new PhotonException("Unsupported library: " + name());
+        throw new IllegalArgumentException("Unsupported library: " + name());
     }
 
 }
