@@ -109,8 +109,8 @@ public class Window implements PhotonLogic {
 
     public void update(IRenderer<? extends IFramebuffer, ? extends IShader, ? extends IMesh, ? extends ITexture> renderer) throws PhotonException {
         renderer.swapBuffers();
-        GLFW.glfwPollEvents();
         input.updateInput();
+        GLFW.glfwPollEvents();
         try (MemoryStack stack = MemoryStack.stackPush()) {
             DoubleBuffer xCursor = stack.mallocDouble(1);
             DoubleBuffer yCursor = stack.mallocDouble(1);
