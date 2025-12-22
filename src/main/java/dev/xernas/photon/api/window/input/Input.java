@@ -1,6 +1,7 @@
 package dev.xernas.photon.api.window.input;
 
 import dev.xernas.photon.api.window.Window;
+import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
@@ -11,19 +12,20 @@ public class Input {
     private final Window window;
     private final boolean azerty;
     private final Map<Key, Action> keyMap = new HashMap<>();
-    private final MousePosition mousePosition;
-    private final MousePosition absoluteMousePosition;
+    private final Mouse mouse;
+    private final Mouse absoluteMouse;
 
     public Input(Window window, boolean azerty) {
         this.window = window;
         this.azerty = azerty;
-        this.mousePosition = new MousePosition(0, 0);
-        this.absoluteMousePosition = new MousePosition(0, 0);
+        this.mouse = new Mouse(0, 0);
+        this.absoluteMouse = new Mouse(0, 0);
     }
 
     public void updateInput() {
         if (keyMap.isEmpty()) return;
         keyMap.clear();
+        resetScrollDelta();
     }
 
     public Action getKeyAction(Key key) {
@@ -52,11 +54,19 @@ public class Input {
     }
 
     public void setMousePosition(double x, double y) {
-        mousePosition.set((float) x, (float) y);
+        mouse.set((float) x, (float) y);
+    }
+
+    public void setScrollDelta(float x, float y) {
+        mouse.setScrollDelta(x, y);
+    }
+
+    public void resetScrollDelta() {
+        mouse.setScrollDelta(0, 0);
     }
 
     public void setAbsoluteMousePosition(double x, double y) {
-        absoluteMousePosition.set((float) x, (float) y);
+        absoluteMouse.set((float) x, (float) y);
     }
 
     public boolean isAzerty() {
@@ -67,11 +77,11 @@ public class Input {
         return window;
     }
 
-    public MousePosition getMousePosition() {
-        return mousePosition;
+    public Mouse getMouse() {
+        return mouse;
     }
 
-    public MousePosition getAbsoluteMousePosition() {
-        return absoluteMousePosition;
+    public Mouse getAbsoluteMouse() {
+        return absoluteMouse;
     }
 }

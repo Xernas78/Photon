@@ -101,6 +101,10 @@ public class Window implements PhotonLogic {
             input.setMousePosition(xpos, ypos);
             if (cursorLocked) setCursorPosition(width / 2, height / 2);
         });
+        // Scroll
+        GLFW.glfwSetScrollCallback(handle, (window, xoffset, yoffset) -> {
+            input.setScrollDelta((float) xoffset, (float) yoffset);
+        });
 
         // Set default cursor
         currentCursor = new Cursor(CursorShape.ARROW);

@@ -3,12 +3,15 @@ package dev.xernas.photon.api.window.input;
 import dev.xernas.photon.api.window.Window;
 import org.joml.Vector2f;
 
-public class MousePosition {
+public class Mouse {
 
     private float x;
     private float y;
 
-    public MousePosition(float x, float y) {
+    private float xScrollDelta;
+    private float yScrollDelta;
+
+    public Mouse(float x, float y) {
         this.x = x;
         this.y = y;
     }
@@ -16,6 +19,11 @@ public class MousePosition {
     public void set(float x, float y) {
         this.x = x;
         this.y = y;
+    }
+
+    public void setScrollDelta(float x, float y) {
+        this.xScrollDelta = x;
+        this.yScrollDelta = y;
     }
 
     public Vector2f toWorldSpace(Window window) {
@@ -39,6 +47,22 @@ public class MousePosition {
 
     public float getY() {
         return y;
+    }
+
+    public boolean hasScrolled() {
+        return xScrollDelta != 0 || yScrollDelta != 0;
+    }
+
+    public float getXScroll() {
+        return xScrollDelta;
+    }
+
+    public float getYScroll() {
+        return yScrollDelta;
+    }
+
+    public float getScroll() {
+        return getYScroll();
     }
 
     @Override
