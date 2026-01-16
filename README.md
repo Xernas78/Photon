@@ -31,6 +31,24 @@ Include the generated JAR file in your project's dependencies:
   <version>2.0.0</version>
 </dependency>
 ```
+
+OR Just use Jitpack
+Add the Jitpack repository to your `pom.xml`:
+```xml
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+</repository>
+```
+
+Then add the dependency:
+```xml
+<dependency>
+    <groupId>com.github.Xernas78</groupId>
+    <artifactId>Photon</artifactId>
+    <version>2.0.0</version>
+</dependency>
+```
 ​
 
 ## 🤝 Contributing
