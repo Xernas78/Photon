@@ -1,19 +1,18 @@
 # Photon
-Photon is a lightweight Java graphics API wrapper designed to simplify rendering tasks in game development and graphical applications. It provides an abstraction layer over low-level graphics operations, making it easier to create and manage graphical content.
+Photon is a lightweight Java graphics API wrapper designed to simplify rendering in game development and graphical apps.
 
-## 🚀 Features
-- **Simplified Graphics Rendering**: Provides an easy-to-use interface for rendering shapes, images, and text.
-- **Modular Design**: Structured to allow easy integration and extension.
-- **Lightweight**: Minimal dependencies to ensure fast performance and easy deployment.​
+It provides an abstraction layer over low-level graphics operations, making it easier to create and manage graphical content.
 
-## 🛠️ Getting Started
-### Prerequisites
-- Java Development Kit (JDK) 8 or higher
-- Apache Maven​
+## Main Features
+- **Simplified Graphics Rendering** - Provides an easy-to-use interface for rendering shapes, images, and text.
+####
+- **Modular Design** - Structured to allow easy integration and extension.
+####
+- **Lightweight** - Minimal dependencies to ensure fast performance and easy deployment.​
 
-### Installation
+## How to use
 
-Add the Jitpack repository to your `pom.xml`:
+Just add the Jitpack repository to your `pom.xml`
 ```xml
 <repository>
     <id>jitpack.io</id>
@@ -21,7 +20,7 @@ Add the Jitpack repository to your `pom.xml`:
 </repository>
 ```
 
-Then add the dependency:
+Then add the dependency !
 ```xml
 <dependency>
     <groupId>com.github.XernasDev</groupId>
@@ -29,7 +28,16 @@ Then add the dependency:
     <version>2.0.0</version>
 </dependency>
 ```
-​
 
-## 🤝 Contributing
-Contributions are welcome! Feel free to open issues or submit pull requests to enhance the functionality or fix bugs.
+## Building
+### Prerequisites
+- Java Development Kit (JDK) 8 or higher
+- Apache Maven​
+
+### Installation
+
+Run the following command to build the project:
+```bash
+mvn clean install
+```
+​
