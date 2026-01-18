@@ -10,14 +10,14 @@
     <packaging>jar</packaging>
 
     <name>Photon</name>
-    <description>A modern Java game engine built on LWJGL</description>
+    <description>A modern Java graphics library wrapper built on LWJGL</description>
     <developers>
         <developer>
-            <name>Xernas78</name>
-            <url>https://github.com/Xernas78</url>
+            <name>XernasDev</name>
+            <url>https://github.com/XernasDev</url>
         </developer>
     </developers>
-    <url>https://github.com/Xernas78/Photon</url>
+    <url>https://github.com/XernasDev/Photon</url>
 
     <licenses>
         <license>
