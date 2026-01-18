@@ -12,26 +12,22 @@ Photon is a lightweight Java graphics API wrapper designed to simplify rendering
 - Apache Maven​
 
 ### Installation
-Clone the repository:​
-```bash
-git clone https://github.com/Xernas78/Photon.git
-cd Photon
+You can simply use Jitpack ! Add the following to your `pom.xml`:
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
 ```
-
-Build the project using Maven:​
-```bash
-mvn clean install
-```
-
-Include the generated JAR file in your project's dependencies:
 ```xml
 <dependency>
-  <groupId>dev.xernas</groupId>
-  <artifactId>Photon</artifactId>
-  <version>1.0.0</version>
+    <groupId>com.github.XernasDev</groupId>
+    <artifactId>Photon</artifactId>
+    <version>1.0.0</version>
 </dependency>
 ```
-
 ## 📄 License
 This project is open-source and available under the MIT License.​
 
